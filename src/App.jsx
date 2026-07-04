@@ -9,12 +9,25 @@ import {
   BAND_X,
   BAND_W,
   CONDUIT_X,
+  TOP,
 } from './purdueModel.js';
 import { LEVEL5_CONTENT } from './level5Content.js';
 import { LEVEL4_CONTENT } from './level4Content.js';
 import { LEVEL3_CONTENT } from './level3Content.js';
+import { LEVEL2_CONTENT } from './level2Content.js';
+import { LEVEL1_CONTENT } from './level1Content.js';
+import { LEVEL0_CONTENT } from './level0Content.js';
+import { CROSSCUTTING_CONTENT } from './crossCuttingContent.js';
 
-const CONTENT = { ...LEVEL5_CONTENT, ...LEVEL4_CONTENT, ...LEVEL3_CONTENT };
+const CONTENT = {
+  ...LEVEL5_CONTENT,
+  ...LEVEL4_CONTENT,
+  ...LEVEL3_CONTENT,
+  ...LEVEL2_CONTENT,
+  ...LEVEL1_CONTENT,
+  ...LEVEL0_CONTENT,
+  ...CROSSCUTTING_CONTENT,
+};
 
 const ZOOM_MS = 750;
 
@@ -199,6 +212,17 @@ export default function App() {
       contentId: c.id,
     });
 
+  const focusCrossCutting = () =>
+    setFocus({
+      levelId: null,
+      compId: null,
+      title: 'Cross-Cutting Controls',
+      tag: 'ALL LEVELS · 5 THROUGH 0',
+      rect: { x: BAND_X, y: TOP, w: BAND_W, h: SVG_H - TOP - 40 },
+      accent: '#475569',
+      contentId: 'crosscutting',
+    });
+
   const worldTransform = focus
     ? zoomTransform(focus.rect, focus.compId ? 34 : 14, focus.compId ? 3.4 : 1.2, focus.compId ? 0.34 : 0.42)
     : 'translate(0px, 0px) scale(1)';
@@ -225,6 +249,9 @@ export default function App() {
         <span><i className="swatch" style={{ background: '#1e40af' }} />IT traffic</span>
         <span><i className="swatch" style={{ background: '#0f766e' }} />OT telemetry</span>
         <span><i className="swatch" style={{ background: '#475569' }} />Fieldbus / process I-O</span>
+        <button type="button" className="crosscutting-link" onClick={focusCrossCutting}>
+          Cross-Cutting Controls (Inventory, Backup &amp; People)
+        </button>
         <span className="legend-hint">Click any component or level to inspect</span>
       </div>
 
