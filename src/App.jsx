@@ -11,6 +11,9 @@ import {
   CONDUIT_X,
 } from './purdueModel.js';
 import { LEVEL5_CONTENT } from './level5Content.js';
+import { LEVEL4_CONTENT } from './level4Content.js';
+
+const CONTENT = { ...LEVEL5_CONTENT, ...LEVEL4_CONTENT };
 
 const ZOOM_MS = 750;
 
@@ -146,7 +149,7 @@ function Band({ level, focus, onFocusLevel, onFocusComponent }) {
             <text x={c.x + 54} y={c.y + 40} className="comp-name">{c.name}</text>
             <text x={c.x + 54} y={c.y + 58} className="comp-sub">{c.sub}</text>
             <circle cx={c.x + c.w - 14} cy={c.y + 16} r="3"
-              fill={LEVEL5_CONTENT[c.id] ? '#16a34a' : '#cbd5e1'} className={LEVEL5_CONTENT[c.id] ? 'status-dot' : ''} />
+              fill={CONTENT[c.id] ? '#16a34a' : '#cbd5e1'} className={CONTENT[c.id] ? 'status-dot' : ''} />
           </g>
         );
       })}
@@ -253,7 +256,7 @@ export default function App() {
         </svg>
 
         {focus && popupOpen && (() => {
-          const entry = LEVEL5_CONTENT[focus.contentId];
+          const entry = CONTENT[focus.contentId];
           return (
             <div className="modal-backdrop" onClick={() => setFocus(null)}>
               <div className={`modal ${entry ? 'modal-wide' : ''}`} onClick={(e) => e.stopPropagation()} style={{ borderTopColor: focus.accent }}>

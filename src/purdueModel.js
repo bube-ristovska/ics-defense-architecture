@@ -1,9 +1,8 @@
 // Geometry + content model for the Purdue Enterprise Reference Architecture diagram.
-// Level 5 is modeled as the thesis defines it: a single "corporate IT" layer
-// covering identity, endpoints, email, web and file/data infrastructure.
-// Level 4 is reserved for the thesis's actual Level 4 scope (ERP, production
-// planning, maintenance, logistics) and is populated with placeholders until
-// that chapter section is supplied.
+// Level 5 covers corporate IT: identity, endpoints, email, web and file/data
+// infrastructure. Level 4 covers business and logistics systems: ERP,
+// production planning, maintenance, logistics, plus the shared databases,
+// identity/access and integration/API infrastructure that support them.
 // All coordinates are in SVG user units (viewBox space).
 
 export const SVG_W = 1240;
@@ -57,7 +56,10 @@ const RAW = [
       { id: 'erp', name: 'ERP System', sub: 'ENTERPRISE RESOURCE PLANNING', icon: 'server' },
       { id: 'planning', name: 'Production Planning', sub: 'SCHEDULING & MES', icon: 'monitor' },
       { id: 'maintenance', name: 'Maintenance Mgmt', sub: 'CMMS / WORK ORDERS', icon: 'shield' },
-      { id: 'logistics', name: 'Logistics', sub: 'SUPPLY CHAIN PLATFORM', icon: 'gateway' },
+      { id: 'logistics', name: 'Logistics', sub: 'WMS / TMS / EDI', icon: 'gateway' },
+      { id: 'bizdb', name: 'Databases', sub: 'PRODUCTION & INVENTORY DATA', icon: 'database' },
+      { id: 'access', name: 'Identity & Access', sub: 'ROLES, MFA & SEPARATION OF DUTIES', icon: 'key' },
+      { id: 'integration', name: 'Integration & APIs', sub: 'MIDDLEWARE & THIRD-PARTY LINKS', icon: 'code' },
     ],
   },
   {
