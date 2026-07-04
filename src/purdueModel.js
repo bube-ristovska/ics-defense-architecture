@@ -1,13 +1,15 @@
 // Geometry + content model for the Purdue Enterprise Reference Architecture diagram.
-// Structure mirrors the reference image: levels 5-0, no 3.5 layer,
-// firewalls at the 5/4, 4/3 and 3/2 boundaries, Ethernet switch bars in 4/3/2.
+// Level 5 is modeled as the thesis defines it: a single "corporate IT" layer
+// covering identity, endpoints, email, web and file/data infrastructure.
+// Level 4 is reserved for the thesis's actual Level 4 scope (ERP, production
+// planning, maintenance, logistics) and is populated with placeholders until
+// that chapter section is supplied.
 // All coordinates are in SVG user units (viewBox space).
 
 export const SVG_W = 1240;
 
 export const BAND_X = 40;
 export const BAND_W = 1160;
-export const BAND_H = 150;
 export const GAP = 44;
 export const TOP = 40;
 
@@ -17,34 +19,45 @@ const COMP_AREA_X = 290;
 const COMP_AREA_W = BAND_X + BAND_W - COMP_AREA_X - 25;
 const COMP_W = 200;
 const COMP_H = 84;
+const MAX_PER_ROW = 4;
+const HEADER_PAD = 40;
+const ROW_GAP = 14;
+const BUS_GAP = 4;
+const BUS_H = 15;
+const BOTTOM_PAD_BUS = 7;
+const BOTTOM_PAD_NOBUS = 20;
 
 const RAW = [
   {
     id: 'l5',
     num: '5',
-    name: 'Internet DMZ',
-    zone: 'EXTERNAL',
+    name: 'Corporate IT',
+    zone: 'IT · ENTERPRISE',
     accent: '#1e40af',
     tint: '#f4f7fd',
     components: [
       { id: 'internet', name: 'Internet', sub: 'WAN · PUBLIC NETWORK', icon: 'globe' },
-      { id: 'web', name: 'Web Servers', sub: 'PUBLIC SERVICES', icon: 'server' },
-      { id: 'email', name: 'Email', sub: 'MAIL GATEWAY', icon: 'mail' },
+      { id: 'web', name: 'Web Servers', sub: 'INTERNET-FACING SERVICES', icon: 'server' },
+      { id: 'email', name: 'Email', sub: 'SPF · DKIM · DMARC', icon: 'mail' },
+      { id: 'auth', name: 'Authentication', sub: 'IDENTITY, MFA & REMOTE ACCESS', icon: 'key' },
+      { id: 'desktops', name: 'Desktops', sub: 'ENDPOINTS & WORKSTATIONS', icon: 'monitor' },
+      { id: 'files', name: 'File Servers', sub: 'FILE STORAGE & BACKUP', icon: 'database' },
+      { id: 'databases', name: 'Databases', sub: 'NETWORK & LOG INFRASTRUCTURE', icon: 'server' },
     ],
   },
   {
     id: 'l4',
     num: '4',
-    name: 'Enterprise Admin',
-    zone: 'IT · ENTERPRISE',
+    name: 'Business Systems',
+    zone: 'IT · BUSINESS OPERATIONS',
     accent: '#1e40af',
     tint: '#f4f7fd',
     bus: 'ETHERNET SWITCH',
     components: [
-      { id: 'auth', name: 'Authentication', sub: 'IDENTITY SERVICES', icon: 'key' },
-      { id: 'desktops', name: 'Desktops', sub: 'OFFICE LAN', icon: 'monitor' },
-      { id: 'databases', name: 'Databases', sub: 'BUSINESS DATA', icon: 'database' },
-      { id: 'files', name: 'File Servers', sub: 'SHARED STORAGE', icon: 'server' },
+      { id: 'erp', name: 'ERP System', sub: 'ENTERPRISE RESOURCE PLANNING', icon: 'server' },
+      { id: 'planning', name: 'Production Planning', sub: 'SCHEDULING & MES', icon: 'monitor' },
+      { id: 'maintenance', name: 'Maintenance Mgmt', sub: 'CMMS / WORK ORDERS', icon: 'shield' },
+      { id: 'logistics', name: 'Logistics', sub: 'SUPPLY CHAIN PLATFORM', icon: 'gateway' },
     ],
   },
   {
@@ -103,25 +116,47 @@ const RAW = [
   },
 ];
 
-export const SVG_H = TOP + RAW.length * (BAND_H + GAP) - GAP + 40;
-
-export const LEVELS = RAW.map((lvl, i) => {
-  const y = TOP + i * (BAND_H + GAP);
-  const n = lvl.components.length;
-  const spacing = (COMP_AREA_W - n * COMP_W) / (n + 1);
-  return {
-    ...lvl,
+function layoutRow(items, rowIndex, levelY) {
+  const k = items.length;
+  const spacing = (COMP_AREA_W - k * COMP_W) / (k + 1);
+  const y = levelY + HEADER_PAD + rowIndex * (COMP_H + ROW_GAP);
+  return items.map((c, col) => ({
+    ...c,
+    x: COMP_AREA_X + spacing + col * (COMP_W + spacing),
     y,
-    h: BAND_H,
-    components: lvl.components.map((c, j) => ({
-      ...c,
-      x: COMP_AREA_X + spacing + j * (COMP_W + spacing),
-      y: y + 40,
-      w: COMP_W,
-      h: COMP_H,
-    })),
-  };
-});
+    w: COMP_W,
+    h: COMP_H,
+  }));
+}
+
+function layoutLevel(lvl, y) {
+  const n = lvl.components.length;
+  const rows = Math.ceil(n / MAX_PER_ROW);
+  const perRow = Math.ceil(n / rows);
+  const placed = [];
+  for (let r = 0; r < rows; r++) {
+    const chunk = lvl.components.slice(r * perRow, (r + 1) * perRow);
+    placed.push(...layoutRow(chunk, r, y));
+  }
+  const contentBottom = HEADER_PAD + rows * COMP_H + (rows - 1) * ROW_GAP;
+  const h = lvl.bus
+    ? contentBottom + BUS_GAP + BUS_H + BOTTOM_PAD_BUS
+    : contentBottom + BOTTOM_PAD_NOBUS;
+  return { ...lvl, y, h, components: placed };
+}
+
+export const LEVELS = (() => {
+  let cursor = TOP;
+  const out = [];
+  for (const lvl of RAW) {
+    const placedLevel = layoutLevel(lvl, cursor);
+    out.push(placedLevel);
+    cursor += placedLevel.h + GAP;
+  }
+  return out;
+})();
+
+export const SVG_H = LEVELS[LEVELS.length - 1].y + LEVELS[LEVELS.length - 1].h + 40;
 
 // Conduits between adjacent bands; firewalls guard the 5/4, 4/3 and 3/2 boundaries.
 export const CONDUITS = LEVELS.slice(0, -1).map((lvl, i) => {

@@ -10,6 +10,7 @@ import {
   BAND_W,
   CONDUIT_X,
 } from './purdueModel.js';
+import { LEVEL5_CONTENT } from './level5Content.js';
 
 const ZOOM_MS = 750;
 
@@ -20,6 +21,31 @@ function zoomTransform(rect, pad, maxScale, vAnchor = 0.5) {
   const cx = rect.x + rect.w / 2;
   const cy = rect.y + rect.h / 2;
   return `translate(${SVG_W / 2}px, ${SVG_H * vAnchor}px) scale(${s}) translate(${-cx}px, ${-cy}px)`;
+}
+
+function ContentBlocks({ blocks }) {
+  return (
+    <div className="content-blocks">
+      {blocks.map((b, i) => {
+        if (b.h) return <h3 key={i}>{b.h}</h3>;
+        if (b.p) return <p key={i}>{b.p}</p>;
+        if (b.list) return <ul key={i}>{b.list.map((li, j) => <li key={j}>{li}</li>)}</ul>;
+        if (b.code) return <pre key={i} className="mono">{b.code}</pre>;
+        if (b.links) return (
+          <ul key={i} className="link-list">
+            {b.links.map((link, j) => (
+              <li key={j}>
+                <a href={link.url} target="_blank" rel="noopener noreferrer">
+                  <span className="link-icon" aria-hidden="true">↗</span>{link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        );
+        return null;
+      })}
+    </div>
+  );
 }
 
 function Firewall({ cx, cy, color, label }) {
@@ -63,6 +89,7 @@ function Conduit({ conduit }) {
 function Band({ level, focus, onFocusLevel, onFocusComponent }) {
   const dimmed = focus && focus.levelId !== level.id;
   const busY = level.y + 82;
+  const center = level.h / 2;
   return (
     <g className="band" style={{ opacity: dimmed ? 0.22 : 1, transition: 'opacity 0.7s ease' }}>
       <rect
@@ -81,12 +108,12 @@ function Band({ level, focus, onFocusLevel, onFocusComponent }) {
       {/* level label zone (clickable) */}
       <g className="label-zone" onClick={() => onFocusLevel(level)}>
         <rect x={BAND_X + 5} y={level.y} width={235} height={level.h} fill="transparent" />
-        <text x={BAND_X + 52} y={level.y + 88} className="level-num" textAnchor="middle" fill={level.accent}>{level.num}</text>
-        <text x={BAND_X + 96} y={level.y + 58} className="level-eyebrow">LEVEL {level.num}</text>
-        <text x={BAND_X + 96} y={level.y + 80} className="level-name">{level.name}</text>
-        <rect x={BAND_X + 96} y={level.y + 92} width={level.zone.length * 6.4 + 16} height="19" rx="2.5"
+        <text x={BAND_X + 52} y={level.y + center + 13} className="level-num" textAnchor="middle" fill={level.accent}>{level.num}</text>
+        <text x={BAND_X + 96} y={level.y + center - 17} className="level-eyebrow">LEVEL {level.num}</text>
+        <text x={BAND_X + 96} y={level.y + center + 5} className="level-name">{level.name}</text>
+        <rect x={BAND_X + 96} y={level.y + center + 17} width={level.zone.length * 6.4 + 16} height="19" rx="2.5"
           fill="#fff" stroke={level.accent} strokeWidth="0.8" opacity="0.9" />
-        <text x={BAND_X + 104} y={level.y + 105} className="zone-chip" fill={level.accent}>{level.zone}</text>
+        <text x={BAND_X + 104} y={level.y + center + 30} className="zone-chip" fill={level.accent}>{level.zone}</text>
       </g>
       <line x1={BAND_X + 265} y1={level.y + 18} x2={BAND_X + 265} y2={level.y + level.h - 18}
         stroke="#d6dee8" strokeWidth="1" />
@@ -118,7 +145,8 @@ function Band({ level, focus, onFocusLevel, onFocusComponent }) {
             <Icon type={c.icon} x={c.x + 15} y={c.y + (c.h - 26) / 2 + 2} color={level.accent} />
             <text x={c.x + 54} y={c.y + 40} className="comp-name">{c.name}</text>
             <text x={c.x + 54} y={c.y + 58} className="comp-sub">{c.sub}</text>
-            <circle cx={c.x + c.w - 14} cy={c.y + 16} r="3" fill="#16a34a" className="status-dot" />
+            <circle cx={c.x + c.w - 14} cy={c.y + 16} r="3"
+              fill={LEVEL5_CONTENT[c.id] ? '#16a34a' : '#cbd5e1'} className={LEVEL5_CONTENT[c.id] ? 'status-dot' : ''} />
           </g>
         );
       })}
@@ -152,6 +180,7 @@ export default function App() {
       tag: `LEVEL ${level.num} · ${level.zone}`,
       rect: { x: BAND_X, y: level.y, w: BAND_W, h: level.h },
       accent: level.accent,
+      contentId: level.id,
     });
 
   const focusComponent = (level, c) =>
@@ -163,6 +192,7 @@ export default function App() {
       sub: c.sub,
       rect: { x: c.x, y: c.y, w: c.w, h: c.h },
       accent: level.accent,
+      contentId: c.id,
     });
 
   const worldTransform = focus
@@ -222,20 +252,25 @@ export default function App() {
           </g>
         </svg>
 
-        {focus && popupOpen && (
-          <div className="modal-backdrop" onClick={() => setFocus(null)}>
-            <div className="modal" onClick={(e) => e.stopPropagation()} style={{ borderTopColor: focus.accent }}>
-              <div className="modal-tag mono" style={{ color: focus.accent }}>{focus.tag}</div>
-              <h2>{focus.title}</h2>
-              {focus.sub && <div className="modal-sub mono">{focus.sub}</div>}
-              <div className="modal-body">Placeholder here</div>
-              <div className="modal-footer">
-                <span className="mono">ESC or click outside to return</span>
-                <button onClick={() => setFocus(null)}>Back to overview</button>
+        {focus && popupOpen && (() => {
+          const entry = LEVEL5_CONTENT[focus.contentId];
+          return (
+            <div className="modal-backdrop" onClick={() => setFocus(null)}>
+              <div className={`modal ${entry ? 'modal-wide' : ''}`} onClick={(e) => e.stopPropagation()} style={{ borderTopColor: focus.accent }}>
+                <div className="modal-tag mono" style={{ color: focus.accent }}>{focus.tag}</div>
+                <h2>{focus.title}</h2>
+                {focus.sub && <div className="modal-sub mono">{focus.sub}</div>}
+                {entry
+                  ? <div className="modal-body-scroll"><ContentBlocks blocks={entry.blocks} /></div>
+                  : <div className="modal-body">Placeholder here</div>}
+                <div className="modal-footer">
+                  <span className="mono">ESC or click outside to return</span>
+                  <button onClick={() => setFocus(null)}>Back to overview</button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </main>
     </div>
   );
