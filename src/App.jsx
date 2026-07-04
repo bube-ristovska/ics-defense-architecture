@@ -12,8 +12,9 @@ import {
 } from './purdueModel.js';
 import { LEVEL5_CONTENT } from './level5Content.js';
 import { LEVEL4_CONTENT } from './level4Content.js';
+import { LEVEL3_CONTENT } from './level3Content.js';
 
-const CONTENT = { ...LEVEL5_CONTENT, ...LEVEL4_CONTENT };
+const CONTENT = { ...LEVEL5_CONTENT, ...LEVEL4_CONTENT, ...LEVEL3_CONTENT };
 
 const ZOOM_MS = 750;
 
@@ -124,9 +125,9 @@ function Band({ level, focus, onFocusLevel, onFocusComponent }) {
       {/* Ethernet switch bar, as in the reference diagram */}
       {level.bus && (
         <g>
-          <rect x={305} y={level.y + 128} width={BAND_X + BAND_W - 35 - 305} height="15" rx="2"
+          <rect x={305} y={level.y + level.busY} width={BAND_X + BAND_W - 35 - 305} height="15" rx="2"
             fill="#fff" stroke={level.accent} strokeWidth="0.8" opacity="0.9" />
-          <text x={(305 + BAND_X + BAND_W - 35) / 2} y={level.y + 139} textAnchor="middle"
+          <text x={(305 + BAND_X + BAND_W - 35) / 2} y={level.y + level.busY + 11} textAnchor="middle"
             className="bus-label" fill={level.accent}>{level.bus}</text>
         </g>
       )}

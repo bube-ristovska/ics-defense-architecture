@@ -65,16 +65,19 @@ const RAW = [
   {
     id: 'l3',
     num: '3',
-    name: 'Ops Admin',
-    zone: 'OT · OPERATIONS',
+    name: 'Site Operations',
+    zone: 'OT · SITE OPERATIONS',
     accent: '#0f766e',
     tint: '#f0f9f7',
     bus: 'ETHERNET SWITCH',
     components: [
       { id: 'historian', name: 'Historian', sub: 'TIME-SERIES DB', icon: 'database' },
-      { id: 'dc', name: 'Domain Controller', sub: 'OT DIRECTORY', icon: 'key' },
-      { id: 'monitoring', name: 'Monitoring', sub: 'HEALTH & IDS', icon: 'hmi' },
-      { id: 'thirdparty', name: '3rd Party', sub: 'VENDOR ACCESS', icon: 'users' },
+      { id: 'alarm', name: 'Alarm & Analytics', sub: 'EVENTS, SUPPRESSION & ANALYTICS', icon: 'bell' },
+      { id: 'opc', name: 'OPC & Integration', sub: 'PROTOCOL & APPLICATION INTERFACES', icon: 'gateway' },
+      { id: 'thirdparty', name: 'Vendor & Remote Access', sub: 'TRANSIENT DEVICES & SUPPORT', icon: 'users' },
+      { id: 'dc', name: 'Domain Controller', sub: 'OT DIRECTORY & ACCESS', icon: 'key' },
+      { id: 'monitoring', name: 'Monitoring', sub: 'NETWORK, IDS & HOST HARDENING', icon: 'hmi' },
+      { id: 'backup', name: 'Backup & Patch', sub: 'UPDATES, BACKUP & FILE TRANSFER', icon: 'shield' },
     ],
   },
   {
@@ -141,10 +144,11 @@ function layoutLevel(lvl, y) {
     placed.push(...layoutRow(chunk, r, y));
   }
   const contentBottom = HEADER_PAD + rows * COMP_H + (rows - 1) * ROW_GAP;
+  const busY = contentBottom + BUS_GAP;
   const h = lvl.bus
     ? contentBottom + BUS_GAP + BUS_H + BOTTOM_PAD_BUS
     : contentBottom + BOTTOM_PAD_NOBUS;
-  return { ...lvl, y, h, components: placed };
+  return { ...lvl, y, h, busY, components: placed };
 }
 
 export const LEVELS = (() => {
