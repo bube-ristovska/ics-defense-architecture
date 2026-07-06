@@ -97,6 +97,17 @@ export const LEVEL2_CONTENT = {
       { p: `Operators should not normally be able to exit the HMI application and access the desktop, command prompt or operating-system configuration. Kiosk functions or application restrictions should be used where supported.` },
       { p: `Alarm acknowledgements, setpoint changes, manual overrides and other important operator actions should be associated with an identifiable account and recorded in the application log.` },
       { p: `Automatic screen locking should be configured carefully. It should protect unattended engineering and administrative sessions without interfering with continuously attended operator consoles. Physical access restrictions and control-room procedures should support the technical controls.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Dedicate HMIs to process supervision; remove email, browsing and office use',
+        'Remove or disable unused operating-system services and applications',
+        'Restrict host firewalls to required SCADA, controller and management systems',
+        'Disable remote-control sessions on operator HMIs entirely',
+        'Lock operators into the HMI application with kiosk-style restrictions',
+        'Tie operator commands and alarm actions to identifiable accounts and log them',
+        'Configure screen locking that protects admin sessions without blinding operators',
+      ] },
     ],
   },
 
@@ -112,6 +123,16 @@ export const LEVEL2_CONTENT = {
       { p: `Remote administration should be limited to approved management systems or jump hosts. RDP, SSH, SMB and other administrative protocols should be blocked from all other network sources.` },
       { p: `Configuration changes should follow formal change management. Changes to communication drivers, alarm definitions, user roles, controller addresses, graphics and tag databases should be approved, documented and backed up before implementation.` },
       { p: `Security controls should be tested to ensure that they do not interfere with alarm processing, controller communication or operator visibility.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Remove development tools, browsers and email clients from SCADA servers',
+        'Strip unnecessary domain and local-administrator rights from SCADA service accounts',
+        'Restrict remote administration to approved jump hosts; block RDP, SSH and SMB elsewhere',
+        'Put drivers, alarm definitions, roles and tag databases under change management',
+        'Back up the configuration before every change',
+        'Test security controls against alarm processing and controller communication',
+      ] },
     ],
   },
 
@@ -134,6 +155,19 @@ export const LEVEL2_CONTENT = {
       { p: `Controller downloads, online logic edits, firmware updates and major configuration changes should require an approved change record. Before a download, the current controller program should be uploaded or otherwise backed up so that it can be restored if the change fails.` },
       { p: `Application allowlisting is suitable for engineering workstations because their required software changes infrequently. Only approved engineering applications, scripts, libraries and installers should be permitted to execute.` },
       { p: `Where separate engineering workstations are not available, the organization should at least use separate engineering accounts, restricted network rules and formal maintenance windows to distinguish engineering activity from normal operation.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Dedicate the engineering workstation to engineering; no browsing or email',
+        'Remove unused vendor tools, sample projects and outdated drivers',
+        'Limit network reach to controllers the engineer actually maintains',
+        'Enable controller-programming access only during approved maintenance windows',
+        'Store projects in a controlled repository with an approved version per controller',
+        'Require change records for downloads, online edits and firmware updates',
+        'Back up the running controller program before every download',
+        'Apply application allowlisting to the engineering software set',
+        'Verify vendor software and project files before use',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -160,6 +194,17 @@ export const LEVEL2_CONTENT = {
 
       { h: 'Capital Investment: Industrial Firewalls' },
       { p: `Industrial firewalls can be placed between process cells, between Levels 2 and 1 or in front of especially critical controllers. Protocol-aware models may be able to restrict specific industrial functions instead of allowing every command that uses an approved port.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Enable OPC UA signed and encrypted modes; disable anonymous endpoints',
+        'Maintain OPC UA trust lists and plan certificate renewals',
+        'Enable DNP3 Secure Authentication where both endpoints support it',
+        'Restrict Modbus to defined master-and-controller pairs',
+        'Block write function codes from monitoring-only systems',
+        'Permit controller-programming protocols only from approved engineering workstations',
+        'Filter high-risk operations with protocol-aware firewalls where available',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -189,6 +234,21 @@ export const LEVEL2_CONTENT = {
 
       { h: 'Capital Investment: Privileged Access Management' },
       { p: `Privileged-access management can protect engineering and administrator credentials. Useful functions include password vaulting, automatic credential rotation, approval before use and recording of privileged sessions.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Provide individual accounts for every operator, engineer and administrator',
+        'Limit operator accounts to the commands their role requires',
+        'Separate engineering accounts from operator accounts',
+        'Dedicate service accounts per application and deny interactive login',
+        'Change default credentials; disable unused and stale vendor accounts',
+        'Rotate passwords on a schedule and after departures or vendor engagements',
+        'Enforce MFA at the gateway, VPN or jump host where applications cannot',
+        'Restrict and record access to control rooms and equipment cabinets',
+        'Keep engineering workstations and servers in locked rooms or cabinets',
+        'Disable or physically block unused USB, serial and network ports',
+        'Authorize, escort and time-limit vendor physical access',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -221,6 +281,19 @@ export const LEVEL2_CONTENT = {
 
       { h: 'Capital Investment: Dedicated Remote-Access Gateway' },
       { p: `A dedicated remote-access gateway can provide MFA, approval workflows, session recording and temporary vendor access. This is preferable to maintaining several independent vendor remote-access products on Level 2 systems.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Route all remote access through VPN with MFA, the DMZ and a monitored jump host',
+        'Prohibit direct internet or corporate connections to any Level 2 system',
+        'Keep operator HMIs entirely non-remote',
+        'Assign individual, time-limited accounts per employee and vendor',
+        'Disable file transfer, clipboard and drive redirection by default',
+        'Record sessions and supervise high-risk vendor work internally',
+        'Disable unneeded USB ports; scan approved media on a transfer station',
+        'Verify firmware and installers with hashes or signatures before use',
+        'Document emergency access with individual identity, MFA and later review',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -298,6 +371,16 @@ export const LEVEL2_CONTENT = {
       { h: 'Capital Investment: Endpoint Detection and Response' },
       { p: `Endpoint detection and response may be used on compatible SCADA servers, HMIs and engineering workstations after vendor approval and operational testing. Automatic containment should be configured carefully because isolating a supervisory system may remove operator visibility or control.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Separate Level 2 from Level 3 with deny-by-default firewall rules',
+        'Prohibit direct corporate and Level 4 access to Level 2',
+        'Segment Level 2 by production area or control cell',
+        'Restrict controller-programming protocols to approved engineering workstations',
+        'Separate Safety Instrumented System access from process-control access',
+        'Deploy passive sensors on taps or mirror ports; avoid active scanning',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'Zeek, network security monitoring', url: 'https://zeek.org' },
@@ -342,6 +425,16 @@ export const LEVEL2_CONTENT = {
 
       { h: 'Capital Investment: Dedicated Backup and Recovery Infrastructure' },
       { p: `Dedicated backup infrastructure can provide offline or immutable copies of SCADA configurations and engineering projects. Spare HMIs, engineering workstations or SCADA servers may also be justified where rapid recovery is required. Where older systems cannot be adequately protected, replacement should prioritize devices that are internet-accessible, unsupported, unable to restrict programming access or unable to recover from a verified backup.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Obtain updates from approved sources; never auto-update from the internet',
+        'Test patches and document rollback before maintenance windows',
+        'Verify controller communication, alarms and displays after patching',
+        'Apply compensating controls where a system cannot be patched',
+        'Isolate unsupported operating systems and plan their replacement',
+        'Use one approved internal time source; never public NTP directly',
+      ] },
 
       { h: 'Resources' },
       { links: [

@@ -122,6 +122,16 @@ export const LEVEL4_CONTENT = {
       { h: 'Capital Investment: High Availability and Redundant Integration Services' },
       { p: `Critical ERP, WMS and integration services may require redundant servers, database clustering, alternative network paths and tested failover procedures. Redundancy does not protect against logical corruption or ransomware if the same malicious change is immediately replicated to every node. High availability must therefore be combined with isolated backups and monitoring.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Segment application servers, databases and VM infrastructure into separate zones',
+        'Take application-consistent backups of ERP and database platforms',
+        'Keep one immutable or offline backup copy isolated from production credentials',
+        'Test full application restoration including interfaces and authentication',
+        'Document RTO, RPO and restoration order for each critical service',
+        'Combine high availability with isolated backups; replication is not backup',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'The 3-2-1 backup rule and immutable backups against ransomware', url: search('3-2-1 backup rule immutable backup ransomware') },
@@ -135,6 +145,15 @@ export const LEVEL4_CONTENT = {
       { p: `Level 4 attacks may target the integrity of business processes rather than the availability of systems. Examples include modifying production quantities, changing delivery destinations, creating false maintenance work orders, manipulating quality records, altering bills of material or changing supplier banking information. Deliberate alteration of stored or transmitted records maps to Data Manipulation, T1565, in MITRE ATT&CK.` },
       { p: `Such activity may appear legitimate at the network level because it uses an approved application and a valid user account. Conventional malware signatures may not detect it. High-impact transactions therefore require application-level logging, defined approval workflows and, where appropriate, separation of duties or dual authorization.` },
       { p: `For example, the user who creates a new supplier bank account should not be the same user who approves payment to that account. Similarly, a user who modifies inventory quantities should not be able to remove the corresponding audit record. These controls reduce both malicious insider risk and the effect of compromised accounts. A production planner releasing an unusually large order, or an account submitting transactions at an unusual time or rate, are exactly the kind of business-process anomalies covered under the Databases node's monitoring section.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Enable application-level logging for production-order and master-data changes',
+        'Require approval workflows for high-impact transactions',
+        'Separate creation and approval of supplier bank-account changes',
+        'Prevent users who modify records from deleting the matching audit entries',
+        'Alert on unusually large orders and off-hours transactions',
+      ] },
     ],
   },
 
@@ -144,6 +163,14 @@ export const LEVEL4_CONTENT = {
       { p: `Computerized maintenance management systems and enterprise asset management platforms hold work orders, equipment records and maintenance schedules that directly affect what operators believe is safe to run. A maintenance administrator can modify work orders or equipment records, so compromise of this account may affect physical operations without requiring direct access to an industrial protocol.` },
       { p: `As with other high-impact Level 4 roles, creation and approval of maintenance work should be separated between different users, and maintenance accounts should have permissions limited to their actual responsibilities rather than broad administrative access. See the Identity & Access node for the full separation-of-duties model that applies to this and other Level 4 applications.` },
       { p: `A maintenance account creating work orders for unrelated equipment is a representative example of a business-process anomaly worth alerting on. The Databases node's monitoring section covers this alongside the equivalent examples for warehouse, production and supplier transactions.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Separate creation and approval of maintenance work orders',
+        'Limit maintenance-account permissions to actual responsibilities',
+        'Alert on work orders created for unrelated equipment',
+        'Review CMMS and asset-management role assignments periodically',
+      ] },
     ],
   },
 
@@ -169,6 +196,18 @@ export const LEVEL4_CONTENT = {
 
       { h: 'Capital Investment: Endpoint Management and Network Access Control' },
       { p: `Organizations with large numbers of warehouse and mobile devices may require enterprise mobile-device management and network access control. These systems can enforce approved configurations, certificates, supported software versions and device compliance before network access is granted. The return depends on the number of devices and the risk created by unmanaged endpoints. Small environments may achieve sufficient control through static segmentation and manual management.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Inventory warehouse scanners, printers and terminals; remove default passwords',
+        'Place warehouse endpoints on dedicated segments away from critical databases',
+        'Replace plain FTP and email exchange with SFTP, HTTPS or managed file transfer',
+        'Assign every partner connection an owner, data scope and review date',
+        'Scan and validate inbound partner files before automated processing',
+        'Block execution of uploaded files in automated import directories',
+        'Manage supported devices with MDM and allowlisting; segment the rest',
+        'Require re-authentication or supervisor approval for high-risk actions on shared terminals',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -280,6 +319,20 @@ export const LEVEL4_CONTENT = {
       { h: 'Capital Investment: EDR and XDR' },
       { p: `Commercial EDR or XDR platforms can provide stronger behavioural detection and faster investigation of ransomware, credential theft and lateral movement. Automated containment should be tested carefully on systems supporting production and logistics. For critical servers, a policy that immediately terminates a suspicious process may be safer than one that disconnects the complete server from the network. Response actions should be agreed with the application owner and tested before enforcement.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Build servers, databases and middleware from documented secure baselines',
+        'Change default credentials before any system joins the production network',
+        'Restrict database connections to approved application and administration hosts',
+        'Grant least-privilege database permissions; keep reporting accounts read-only',
+        'Remove default accounts and sample databases',
+        'Mask production data before copying it into test environments',
+        'Store secrets in a vault, never in code or configuration files',
+        'Enforce TLS for applications, APIs, database connections and file transfers',
+        'Log large exports; define retention and secure deletion',
+        'Patch by exposure: internet-facing and actively exploited vulnerabilities first',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'Message broker / reverse proxy patterns for cross-zone termination', url: search('message broker reverse proxy') },
@@ -319,6 +372,16 @@ export const LEVEL4_CONTENT = {
 
       { h: 'Capital Investment: Privileged Access Management' },
       { p: `A commercial PAM platform can vault and rotate administrative, database, service and integration credentials. It can also provide time-limited privilege and record administrative sessions. PAM is especially useful where many applications contain embedded service-account passwords or where external integrators require periodic administration. The platform should support emergency access and high availability so that its failure does not prevent urgent operational maintenance.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Enforce MFA for privileged users and sensitive Level 4 applications',
+        'Prefer phishing-resistant authentication for transaction-approval roles',
+        'Map application roles to actual business responsibilities',
+        'Make service accounts non-interactive with documented owners',
+        'Never reuse service credentials across the Level 4 and Level 3 environments',
+        'Vault and rotate administrative and service credentials',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -364,6 +427,20 @@ export const LEVEL4_CONTENT = {
 
       { h: 'Capital Investment: Web Application Firewall and API Gateway' },
       { p: `Internet-facing and partner-facing applications may require a web application firewall to detect common web attacks and apply controls before requests reach the application. An API gateway can centralize authentication, rate limiting, schema validation, certificate management and logging for APIs used by suppliers, carriers and internal systems. These technologies do not correct insecure application logic, but they reduce exposure and provide a controlled enforcement point.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Separate development, test and production environments',
+        'Review code and third-party dependencies before deployment',
+        'Enforce authentication and per-object authorization on every API',
+        'Apply input validation, rate limiting and schema validation per the OWASP API Top 10',
+        'Place internet-facing and partner APIs behind a gateway or reverse proxy',
+        'Disable unused endpoints and old API versions; give API keys limited scope and expiry',
+        'Require SBOMs and vulnerability notification in vendor contracts',
+        'Limit vendor remote support to MFA-protected, time-limited bastion access',
+        'Document which cloud security responsibilities belong to the provider and which stay with you',
+        'Prepare procedures for cloud-service and internet outages',
+      ] },
 
       { h: 'Resources' },
       { links: [

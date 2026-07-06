@@ -102,6 +102,18 @@ export const LEVEL1_CONTENT = {
       { p: `Changes should require a formal change record identifying the reason for the change, affected devices, responsible engineer, approval, planned implementation time, test procedure and rollback method. Before a change, the currently running project should be uploaded or otherwise verified against the approved repository; after the change, the new running version should be compared with the approved project.` },
       { p: `Online edits, forced values and temporary bypasses should be documented. Forces and bypasses should be removed after testing and reviewed before the system returns to normal operation.` },
       { p: `Project passwords and logic-protection features should be enabled where available. However, passwords should not prevent the asset owner from recovering or migrating the project: the organization must retain sufficient access to operate and restore its own equipment.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Keep controllers in RUN mode; remove and store key switches securely',
+        'Enable remote programming only during approved maintenance windows',
+        'Enable memory protection, write protection and project passwords',
+        'Store approved production projects in a protected repository',
+        'Require change records for downloads, online edits and firmware updates',
+        'Verify the running project against the repository before and after changes',
+        'Document and remove forces, online edits and temporary bypasses',
+        'Retain owner access to password-protected projects',
+      ] },
     ],
   },
 
@@ -124,6 +136,17 @@ export const LEVEL1_CONTENT = {
       { p: `Where controllers support individual accounts and roles, permissions should be separated between process monitoring, process operation, maintenance, logic programming, firmware management and security administration.` },
       { p: `Shared controller passwords may be unavoidable on legacy devices. In that case the password should be held in a controlled credential vault, access should require approval and the surrounding engineering session should be recorded. Controllers that cannot support strong authentication should be placed behind controls that can enforce it, such as an industrial firewall, engineering gateway or privileged-access system.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Remove public IP exposure from every controller and gateway',
+        'Use private addressing, managed gateways or VPNs at remote sites',
+        'Remove default routes, DNS and internet time where not required',
+        'Change default credentials and make passwords unique per device',
+        'Disable unused vendor and diagnostic accounts or restrict them via the network',
+        'Vault shared legacy passwords with approval workflows and session recording',
+        'Treat isolation as one control; keep controlling media and transient devices',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'Secrets management vault for shared controller credentials', url: search('secrets management vault') },
@@ -139,6 +162,15 @@ export const LEVEL1_CONTENT = {
       { h: 'Time Synchronization' },
       { p: `HMIs, SCADA servers, engineering workstations, controllers and monitoring systems should share a common, approved internal time source. Accurate time is necessary for correlating controller events, alarms, forced outputs, network alerts and engineering changes, and for the sequence-of-events records used in electrical systems.` },
       { p: `Level 1 devices should not synchronize directly from public internet time services. In IEC 61850 and other electrical environments, the protocol used for time distribution, such as PTP or IRIG-B, should itself be delivered from a trusted internal source and protected like any other control communication.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Separate management, engineering and protection communication',
+        'Require controlled engineering access for IED and protection-setting changes',
+        'Distribute time from a trusted internal source and protect PTP or IRIG-B',
+        'Never synchronize Level 1 devices from public internet time services',
+        'Alert on unexpected changes to protection-relay settings',
+      ] },
     ],
   },
 
@@ -156,6 +188,18 @@ export const LEVEL1_CONTENT = {
 
       { h: 'Capital Investment: Dedicated Safety-System Engineering' },
       { p: `Dedicated safety-system engineering workstations and physically separate safety networks reduce the possibility that compromise of the normal process-control environment reaches the Safety Instrumented System.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Keep the SIS independent from the BPCS to the extent the safety design requires',
+        'Use separate engineering authorization, network paths and change procedures',
+        'Deny safety-programming permissions to HMI and process-control accounts',
+        'Limit BPCS-to-SIS connections to status information; avoid writes into the SIS',
+        'Validate every safety-logic change against the Safety Requirements Specification',
+        'Keep safety key switches protected; disable engineering outside maintenance',
+        'Physically secure safety cabinets, programming ports and keys',
+        'Coordinate all cybersecurity controls with functional-safety engineers',
+      ] },
     ],
   },
 
@@ -194,6 +238,20 @@ export const LEVEL1_CONTENT = {
       { h: 'Capital Investment: Unidirectional Gateways' },
       { p: `Unidirectional gateways may be appropriate where controller data must leave a critical cell but no inbound communication is required. They are less suitable where supervisory commands or engineering access must travel in both directions.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Divide Level 1 into cells by process function, criticality and safety impact',
+        'Firewall Level 2-to-1 traffic with documented source and destination pairs',
+        'Restrict programming functions to approved engineering workstations',
+        'Filter read, write and engineering operations where protocol-aware devices allow',
+        'Disable web, FTP, Telnet, SNMP and other unused controller services',
+        'Block services that cannot be disabled at the nearest switch or firewall',
+        'Disable unused switch ports, wireless, cellular, Bluetooth and USB interfaces',
+        'Limit Modbus to approved pairs; block writes from read-only systems',
+        'Enable DNP3 Secure Authentication where both endpoints support it',
+        'Enable the strongest S7 or proprietary access-protection settings available',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'DNP3 Secure Authentication', url: search('DNP3 Secure Authentication') },
@@ -219,6 +277,18 @@ export const LEVEL1_CONTENT = {
 
       { h: 'Capital Investment: Dedicated Engineering-Access Gateway' },
       { p: `Dedicated engineering-access gateways can ensure that controller programming occurs only through approved systems, providing MFA, credential vaulting, session recording and temporary authorization.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Program controllers only from approved engineering workstations',
+        'Route remote engineering via VPN with MFA, the DMZ and a monitored jump host',
+        'Enable programming access per maintenance period and disable it afterward',
+        'Require approved change records for all engineering work',
+        'Supervise firmware, safety-logic and protection changes internally',
+        'Record remote sessions; disable file transfer and device redirection',
+        'Scan and verify project files before they enter the environment',
+        'Lock cabinets and control access to programming ports and memory cards',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -296,6 +366,15 @@ export const LEVEL1_CONTENT = {
       { p: `Commercial OT-monitoring platforms may provide detailed protocol decoding, controller-change detection, firmware identification and integration with engineering tools. Monitoring should remain passive unless an active function has been tested and approved.` },
       { p: `Capital spending should first remove uncontrolled access and unsupported equipment. Expensive monitoring provides limited benefit if controllers remain internet-accessible, default credentials remain active or engineering workstations have unrestricted programming access.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Forward controller and engineering-workstation logs to protected monitoring',
+        'Compare running logic against the approved repository on a schedule',
+        'Investigate differences manually; never auto-overwrite controller logic',
+        'Prioritize safety controllers and protection relays for comparison',
+        'Baseline traffic passively; avoid active scanning of fragile devices',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'Zeek, network security monitoring', url: 'https://zeek.org' },
@@ -330,6 +409,22 @@ export const LEVEL1_CONTENT = {
       { h: 'Capital Investment: Redundancy, Power and Test Environments' },
       { p: `Redundant controllers, communication modules and power supplies can improve availability. Redundancy must not create an unmanaged security path, and both redundant units should use approved firmware and configuration. Uninterruptible power supplies and backup generators extend this resilience to the loss of site power.` },
       { p: `Offline test environments and spare controllers allow firmware, logic and security changes to be tested without affecting production. A representative Level 1 testbed is particularly valuable when the production process cannot tolerate active scanning or untested updates.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Track vendor and CISA advisories for installed controller models and firmware',
+        'Obtain firmware from approved sources and verify signatures or hashes',
+        'Test updates on spare hardware before production deployment',
+        'Apply compensating controls where firmware cannot be updated',
+        'Prefer secure-boot, signed-firmware controllers when purchasing',
+        'Install controllers in locked cabinets with tamper indicators',
+        'Control mode-switch keys; never leave keys inserted',
+        'Back critical cabinets with UPS, and generators at critical sites',
+        'Clear decommissioned controllers and memory cards before disposal',
+        'Keep one offline backup of everything needed to rebuild each device',
+        'Restore-test backups onto compatible hardware',
+        'Stock spares with compatible firmware and documented procedures',
+      ] },
 
       { h: 'Resources' },
       { links: [

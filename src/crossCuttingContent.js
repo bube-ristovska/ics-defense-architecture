@@ -37,6 +37,20 @@ export const CROSSCUTTING_CONTENT = {
         'Change management with approval, testing and a rollback plan for every significant change',
       ] },
       { p: `These cross-cutting controls create the foundation for the technical measures described at each Purdue level. Segmentation and monitoring are less effective when assets are unknown, recovery is impossible when configurations are not backed up, and procedures fail when personnel do not understand their responsibilities.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Maintain one authoritative inventory covering Levels 5 through 0',
+        'Record permitted communication paths, initiators and protocols',
+        'Update the inventory after installs, replacements, firmware and network changes',
+        'Keep one offline or immutable backup copy under separate credentials',
+        'Test restoration end to end, including authentication and interfaces',
+        'Document manual and degraded operating procedures',
+        'Assign owners for accounts, firewall changes, patching, backups and vendor access',
+        'Require dual approval (system owner plus process or safety engineer) for high-risk changes',
+        'Deliver role-appropriate training and exercise incident scenarios regularly',
+        'Hold third parties to internal requirements with expiring, monitored access',
+      ] },
     ],
   },
 };

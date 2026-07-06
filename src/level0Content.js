@@ -71,6 +71,17 @@ export const LEVEL0_CONTENT = {
       { h: 'Analog Signals and Wiring' },
       { p: `Document and label field wiring, lock junction and marshalling boxes, and ensure spare pairs and unused terminals give no undocumented route into the system. Follow engineering requirements for shielding, grounding and cable separation, and use signal isolators where needed.` },
       { p: `Configure the controller to treat out-of-range conditions as faults rather than valid readings, and use line-fault detection so open circuits, shorts, power loss and stale values produce clear diagnostics.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Limit sensor configuration to actual process requirements',
+        'Avoid unnecessarily broad ranges; disable unneeded remote configuration',
+        'Calibrate against traceable references on a defined schedule',
+        'Authorize calibration changes and verify them against the baseline',
+        'Check the device identity reported over the network against the asset record',
+        'Label and lock field wiring, junction and marshalling boxes',
+        'Treat out-of-range values as faults and enable line-fault detection',
+      ] },
     ],
   },
 
@@ -93,6 +104,18 @@ export const LEVEL0_CONTENT = {
 
       { h: 'Capital Investment: Redundant and Diverse Sensing' },
       { p: `Redundant and diverse sensing keeps a single failed or compromised device from misleading the controller. For high-consequence measurements, diversity (different technologies, vendors or paths) is stronger than identical duplication, evaluated by voting or comparison with alarms on disagreement.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Configure position, speed, torque and direction limits on actuators and drives',
+        'Restrict local and manual control modes',
+        'Allow automatic restart only where the resulting movement is safe',
+        'Confirm every commanded state through feedback',
+        'Define fail states (open, closed or hold) from process and safety analysis',
+        'Alarm on stale or missing signals with defined fallback behaviour',
+        'Add independent feedback for high-consequence actuators',
+        'Use diverse redundant sensing for critical measurements',
+      ] },
     ],
   },
 
@@ -111,6 +134,18 @@ export const LEVEL0_CONTENT = {
 
       { h: 'Capital Investment: Secure Wireless and Timing Infrastructure' },
       { p: `Secure wireless and timing infrastructure may use managed gateways, central key management, directional antennas, radio monitoring and redundancy, plus alternative paths or local fail-safe for jamming or gateway loss. Where devices use satellite time, hardened or anti-spoofing GNSS receivers, holdover oscillators and an independent internal time source reduce the impact of spoofing or jamming.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Enable the strongest supported wireless security modes',
+        'Replace vendor-default network and device keys',
+        'Close joining and commissioning modes outside authorized work',
+        'Allowlist devices and monitor for unknown associations',
+        'Keep gateway administration off general networks',
+        'Replace keys after any suspected compromise',
+        'Define procedures for jamming and gateway loss',
+        'Use hardened GNSS receivers and holdover for timing-critical devices',
+      ] },
     ],
   },
 
@@ -130,6 +165,17 @@ export const LEVEL0_CONTENT = {
 
       { h: 'Capital Investment: Secure Field Gateways' },
       { p: `Secure field gateways can authenticate, encrypt, allowlist devices, convert protocols, filter function codes, log activity and separate monitoring from configuration traffic, protecting legacy devices that cannot protect themselves, but the gateway becomes a critical asset to harden, monitor and back up.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Separate field networks by control cell',
+        'Restrict communication to approved device pairs via switches, ACLs or gateways',
+        'Separate process traffic from engineering and calibration traffic',
+        'Prohibit direct communication from Level 2, Level 3, enterprise IT or the internet',
+        'Route engineering access through an approved Level 2 system',
+        'Define responses to lost signals; never trust stale values indefinitely',
+        'Harden, monitor and back up field gateways as critical assets',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -153,6 +199,17 @@ export const LEVEL0_CONTENT = {
 
       { h: 'Capital Investment: Hardened Enclosures and Tamper Monitoring' },
       { p: `Hardened enclosures and tamper/environmental monitoring, reinforced enclosures, electronic access control, tamper switches, cabinet-open alarms, surveillance and monitoring of temperature, humidity, water and fire, protect high-consequence or remote installations, with alarms integrated into existing monitoring.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Lock enclosures, control keys, and fit tamper seals or switches',
+        'Protect cable routes and antennas; cover unused ports',
+        'Never print credentials or addressing details on labels',
+        'Monitor critical cabinets for temperature, humidity, water and smoke',
+        'Integrate tamper and environmental alarms into existing monitoring',
+        'Protect safety instrumentation more strictly and validate changes against the SRS',
+        'Coordinate safety-instrumentation controls with functional-safety engineers',
+      ] },
     ],
   },
 
@@ -169,6 +226,17 @@ export const LEVEL0_CONTENT = {
       { p: `Treat maintenance laptops, handheld configurators and vendor tools as transient cyber assets (T0864), and removable media as a replication path (T0847). Connect only approved equipment, using approved software and controlled file transfer, and apply least privilege so a technician calibrating one transmitter cannot reach every device.` },
       { p: `Route remote maintenance through the approved remote-access architecture and a controlled Level 2 system; never allow direct internet access to a device or gateway.` },
       { p: `Record each activity: person, time, location, device, reason, before/after configuration, calibration results and approval to return to service. Remove temporary cables, wireless modes, vendor accounts and bypasses afterward.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Record a commissioning baseline (configuration, calibration, photos) before service',
+        'Change defaults and disable unused services during commissioning',
+        'Store approved configurations in a protected repository',
+        'Approve maintenance tools and treat configurators as transient assets',
+        'Apply least privilege to maintenance access',
+        'Record each maintenance activity with before-and-after configuration',
+        'Remove temporary cables, modes, accounts and bypasses after the work',
+      ] },
     ],
   },
 
@@ -219,6 +287,17 @@ export const LEVEL0_CONTENT = {
       { h: 'Capital Investment: Test Environment and Spares' },
       { p: `A test environment and spares lets firmware, configuration, calibration and communication changes be verified before deployment. A lifecycle programme should replace devices that lack security support, use fixed credentials, cannot disable services, cannot verify firmware or cannot be restored.` },
       { p: `Capital spending should first remove uncontrolled access and unsupported equipment, since monitoring adds little while devices remain exposed or unrecoverable.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Baseline device communication at gateways, switches and converters',
+        'Alert on unknown masters and configuration outside maintenance windows',
+        'Compare related measurements (valve vs position, pump vs flow)',
+        'Track stale and frozen values, quality flags and heartbeats',
+        'Compare running configurations against approved baselines on a schedule',
+        'Include physical inspection in operator and maintenance rounds',
+        'Review alerts jointly with process engineers',
+      ] },
     ],
   },
 
@@ -250,6 +329,17 @@ export const LEVEL0_CONTENT = {
 
       { h: 'Capital Investment: Secure-by-Design Replacement' },
       { p: `Secure-by-design replacement prioritizes devices that are externally reachable, unsupported, impossible to authenticate, unable to restrict configuration or hard to restore. Modern devices may add secure boot, signed firmware, authenticated updates, role-based access, encrypted communication, protected configuration and tamper detection.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Record firmware versions and track vendor and CISA advisories',
+        'Verify firmware signatures and test on spares before deployment',
+        'Change default passwords, community strings, PINs and wireless keys',
+        'Disable unused local and wireless interfaces or block them upstream',
+        'Retain full recommissioning packages with at least one offline copy',
+        'Keep critical spares checked for firmware, batteries and licences',
+        'Replace devices that cannot authenticate, update or be restored',
+      ] },
 
       { h: 'Resources' },
       { links: [

@@ -60,6 +60,16 @@ export const LEVEL5_CONTENT = {
       { p: `Capital expenditure should be prioritized according to the attack paths actually observed. An organization suffering repeated identity misuse gains more from PAM and phishing-resistant authentication than from another network appliance; one with limited endpoint visibility should prioritize EDR; one heavily dependent on vendor maintenance should prioritize an OT-aware remote-access platform. Return on investment should weigh avoided downtime, incident-response cost, regulatory exposure, recovery effort and potential safety consequences. In industrial environments, preventing one operational shutdown may justify several years of security investment, but expected value must be evaluated honestly, including licence costs, integration, training, staffing and the possibility that a product is purchased but never properly operated.` },
       { p: `Configuration-only hardening provides a high return because it removes common attack paths using systems the organization already owns. The recommended order is: map the environment, protect privileged and remote identities, remove obsolete accounts and services, restrict endpoint execution, narrow network communication, and strengthen email authentication. These measures do not eliminate all risk, but make it considerably harder for a Level 5 compromise to spread toward Level 4.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Run a baseline gap assessment (for example CISA CSET) against NIST SP 800-82 and IEC 62443',
+        'Map each planned control to a MITRE ATT&CK for ICS technique seen in real incidents',
+        'Tag every control as configuration-only, open-source tool, or capital cost',
+        'Define an AI policy: no sensitive OT data submitted to public AI services',
+        'Require human review of AI-generated configurations before applying them',
+        'Follow the implementation order: map, protect identities, remove obsolete access, restrict endpoints, narrow the network, strengthen email',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'NIST SP 800-82 Rev. 3, OT security control baseline', url: 'https://csrc.nist.gov/pubs/sp/800/82/r3/final' },
@@ -86,6 +96,15 @@ export const LEVEL5_CONTENT = {
       { h: 'DNS Filtering (Protective DNS)' },
       { p: `Outbound DNS resolution should be directed through a controlled resolver that can block known-malicious, newly registered and uncategorized domains. Protective DNS is a low-cost configuration measure because it uses infrastructure the organization already operates and can interrupt malware that relies on domain lookups for command-and-control or payload retrieval. It complements behavioural DNS monitoring: filtering blocks known-bad lookups proactively, while monitoring identifies suspicious patterns that filtering alone would miss.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Build a complete inventory of internet-facing services, identities and firewall rules',
+        'Document trust relationships (shared accounts, RDP paths), not only devices',
+        'Verify owned assets in Shodan and reconcile against firewall and DNS records',
+        'Decommission or firewall exposed systems left over from finished projects',
+        'Route outbound DNS through a filtering resolver that blocks malicious domains',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'Shodan, check your own internet-exposed services', url: 'https://www.shodan.io' },
@@ -102,6 +121,16 @@ export const LEVEL5_CONTENT = {
       { p: `This attack path maps to Exploit Public-Facing Application, T1190 in Enterprise ATT&CK and T0819 in ATT&CK for ICS. Exploitation of vulnerable services during lateral movement maps to Enterprise T1210 and ICS T0866. Directly exposed industrial or OT-adjacent devices may also be represented by Internet Accessible Device, T0883.` },
       { p: `Patching is less difficult at Level 5 than at lower Purdue levels because corporate services generally tolerate scheduled maintenance more easily than controllers or safety systems. Level 5 should therefore have a mature vulnerability and patch-management process. Unsupported operating systems and services should be replaced, isolated or protected by compensating controls, and systems that cannot immediately be patched should not remain directly exposed to the internet. They should sit behind tightly configured firewalls or application gateways.` },
       { p: `Patching alone is not sufficient. Organizations must maintain an accurate inventory of internet-facing systems, software versions and responsible owners; unused applications, protocols and listening services should be removed under the principle of least functionality. Emergency patching should prioritize vulnerabilities that are actively exploited, reachable from the internet, or present on systems that provide administrative access toward Level 4.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Maintain an inventory of internet-facing systems with software versions and owners',
+        'Patch internet-facing servers and remote-access appliances with the highest priority',
+        'Replace, isolate or protect unsupported operating systems and services',
+        'Move systems that cannot be patched behind tightly configured firewalls or gateways',
+        'Remove unused applications, protocols and listening services (least functionality)',
+        'Fast-track patches for actively exploited, internet-reachable vulnerabilities',
+      ] },
     ],
   },
 
@@ -131,6 +160,17 @@ export const LEVEL5_CONTENT = {
       { h: 'Capital Investment: Email Security Gateways' },
       { p: `Commercial email security gateways add advanced phishing, malware and impersonation protection beyond standard SPF, DKIM, DMARC and attachment rules: attachment sandboxing, URL rewriting, business-email-compromise detection, natural-language analysis and post-delivery removal. For example, a malicious Office document with no known malware signature can be opened in a sandbox that observes it launching a script and contacting an external server, blocking the attachment before delivery.` },
       { p: `The expected return is fewer successful phishing and malware infections. This matters because email is a common initial-access route. Operational concerns include false positives, delayed message delivery, privacy considerations and dependency on an external cloud provider.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Publish one SPF record listing every legitimate sender, ending in -all',
+        'Enable DKIM signing and publish selector records; rotate keys per platform guidance',
+        'Deploy DMARC at p=none with report collection',
+        'Move DMARC to quarantine and then reject after aligning all legitimate senders',
+        'Block high-risk attachment types (.exe, .scr, .js, .vbs, .lnk, .iso, .img)',
+        'Quarantine externally sourced Office documents containing macros',
+        'Enable link inspection and display-name impersonation detection',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -215,6 +255,20 @@ export const LEVEL5_CONTENT = {
       { h: 'Capital Investment: OT-Aware Remote-Access Platforms' },
       { p: `Industrial organizations frequently require vendors and engineers to access geographically remote systems, and general-purpose VPN access often provides more network reach than needed. OT-aware remote-access platforms can provide identity-based access to a specific asset or application through a controlled gateway, with MFA, device validation, approval workflows, time-limited access, protocol proxying, session recording and separation between the vendor endpoint and the target network. For example, a pump-system vendor may be granted access only to a designated maintenance server for two hours during an approved window, unable to scan the rest of the network, with the complete session recorded. Expected return: lower third-party risk, improved accountability, reduced probability that a compromised vendor account becomes an unrestricted network entry point. Operational impact: gateway deployment, integration with existing systems, and possible resistance from vendors accustomed to unrestricted VPN access.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Enforce MFA on VPN, remote desktop gateways, cloud email and admin portals',
+        'Prefer phishing-resistant MFA (FIDO2 keys, passkeys) for administrators',
+        'Disable dormant accounts after a 90 or 180 day inactivity review',
+        'Document owner and purpose for every service account',
+        'Grant permissions through role-based groups, never direct assignment',
+        'Keep Domain Admins minimal; separate admin accounts from daily accounts',
+        'Deny privileged accounts interactive login on ordinary workstations',
+        'Monitor breach and infostealer sources for leaked employee credentials',
+        'Route all vendor remote access through an MFA gateway and monitored bastion',
+        'Disable vendor accounts outside approved maintenance windows',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'Microsoft Authenticator', url: search('Microsoft Authenticator app') },
@@ -262,6 +316,19 @@ export const LEVEL5_CONTENT = {
       { h: 'Capital Investment: Security-Awareness Training' },
       { p: `Configuration and technical controls cannot prevent every social-engineering attempt. Commercial awareness platforms provide structured training, simulated phishing campaigns, completion tracking and targeted follow-up. A useful programme goes beyond generic annual videos, for example training finance employees on fraudulent payment requests, IT administrators on fake password-expiration notices, and engineers on malicious vendor documentation, with simulated phishing results identifying departments needing more support. ROI is difficult to measure directly, but indicators include reduced interaction with simulated phishing, faster user reporting and fewer compromised accounts. Training should never be used to shame employees. A punitive approach discourages reporting, while rapid reporting lets the security team remove a malicious message before other users open it.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Reconcile the endpoint inventory against DHCP, directory and management data',
+        'Disable SMBv1, Telnet and other legacy services after dependency testing',
+        'Deploy application allowlisting (WDAC or AppLocker) in audit mode, then enforce',
+        'Enable PowerShell Script Block, Module and Transcription logging',
+        'Restrict PowerShell remoting to approved management hosts',
+        'Block execution from removable media; disable AutoRun and AutoPlay',
+        'Limit USB write access to an authorized transfer group',
+        'Route OT-bound files through a scanned transfer station, never direct USB',
+        'Test EDR policies before enabling automated containment',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'Windows Defender Application Control (WDAC)', url: search('Windows Defender Application Control') },
@@ -287,6 +354,15 @@ export const LEVEL5_CONTENT = {
       { p: `Ransomware is the threat most likely to halt an industrial organization through Level 5 alone, as Colonial Pipeline and NotPetya demonstrated. A tested backup and recovery capability is therefore one of the highest-value measures available, and much of it can be achieved through configuration of existing systems.` },
       { p: `Backups should follow the principle of keeping multiple copies on more than one medium, with at least one copy held offline or in immutable storage that cannot be modified or deleted by an account compromised on the network. This is essential because modern ransomware deliberately searches for and encrypts reachable backup shares before triggering encryption of production data. A backup that is permanently mounted and writable from a compromised server offers little protection.` },
       { p: `Identity services such as Active Directory, configuration data, email and critical file shares should be prioritized. Restoration should be tested on a defined schedule rather than assumed to work, because an untested backup frequently fails when it is most needed. Backup administration should use separate privileged accounts, consistent with the least-privilege approach on the Authentication node, so that a single compromised domain administrator cannot reach both production systems and their backups.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Keep at least one backup copy offline or immutable',
+        'Use separate credentials for backup administration',
+        'Test restoration of identity services, email and critical file shares on a schedule',
+        'Restrict file-server paths that bridge Level 5 toward Level 4',
+        'Log and review large or unusual file transfers',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -353,7 +429,7 @@ export const LEVEL5_CONTENT = {
         'The DNS sensor records communication with an unusual domain',
         'The VPN server records a later login using the victim’s account',
         'The firewall records connection attempts toward Level 4',
-      ] },
+      ], plain: true },
       { p: `No single log proves the complete intrusion. Centralized collection lets these events be connected by time, user, host and network address. Retention periods should reflect operational and regulatory requirements, with high-value authentication and administrative logs retained longer than routine workstation events, and system clocks synchronized so timestamps support correlation and incident reconstruction. Monitoring should begin with a limited set of high-confidence use cases:` },
       { list: [
         'Privileged group-membership changes',
@@ -368,6 +444,17 @@ export const LEVEL5_CONTENT = {
         'Direct Level 5 communication with unauthorized Level 4 systems',
       ] },
       { p: `This architecture ties directly into broader intrusion-detection practice: Windows Event Forwarding, Sysmon and Wazuh provide host and identity telemetry, Suricata provides signature-based network detection, and Zeek supports behavioural and anomaly-oriented analysis. Together they form a low-cost hybrid monitoring capability that is more resilient than any single detection technology.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Enable host firewalls; block unsolicited inbound connections by default',
+        'Block RDP at the internet edge; allow internal RDP only from bastion sources',
+        'Enable Network Level Authentication and disconnect idle sessions',
+        'Scope VPN access by role instead of granting full network reach',
+        'Segment workstations, servers, identity, backup and guest networks into zones',
+        'Review firewall rules quarterly; remove stale rules and unused ports',
+        'Synchronize clocks and centralize logs with defined retention',
+      ] },
 
       { h: 'Resources' },
       { links: [

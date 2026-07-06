@@ -50,6 +50,18 @@ export const LEVEL3_CONTENT = {
       { p: `The final priority is architectural improvement. Dedicated industrial firewalls, an industrial demilitarized zone, privileged-access management, redundant Level 3 services and unidirectional gateways should be introduced according to risk and available budget.` },
       { p: `Level 3 is the point where wide operational information, enterprise integration and access to supervisory systems meet. Hardening this level reduces the probability that a business-network intrusion will reach the control environment and limits the ability of an attacker to manipulate the information on which operators and engineers depend.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Inventory every Level 3 asset and communication path',
+        'Remove direct Level 4-to-Level 2 connections',
+        'Remove unrestricted internet access from Level 3 servers',
+        'Eliminate shared administrator accounts and undocumented remote-access tools',
+        'Make Level 4 access to operational data read-only wherever possible',
+        'Schedule, protect and restore-test historian, alarm and database backups',
+        'Centralize logs and periodically prove that alerts fire and reach recipients',
+        'Plan the industrial DMZ, PAM, redundancy and unidirectional gateways by risk and budget',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'NIST SP 800-82 Rev. 3, OT security control baseline', url: 'https://csrc.nist.gov/pubs/sp/800/82/r3/final' },
@@ -74,6 +86,16 @@ export const LEVEL3_CONTENT = {
       { p: `Historian and operational databases should use separate accounts for data collection, reporting, replication and administration. Reporting users should normally receive read-only permissions. Database administration should be restricted to named administrators using controlled management systems.` },
       { p: `Changes to historian tags, retention rules, collection interfaces and replication jobs should require approval and should be logged. Read access should also be recorded where the platform supports it, so that the organization can see which accounts queried or exported operational data, not only which accounts changed it. Deletion of historical records should be restricted and exceptional. Where supported, audit records should be stored separately so that an attacker who compromises the application cannot easily remove the evidence.` },
       { p: `Connections from Level 4 should use replicated data or restricted database views rather than administrative access to the production historian. Database links, scheduled exports and application programming interfaces should be reviewed for excessive permissions.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Use separate accounts for collection, reporting, replication and administration',
+        'Grant reporting users read-only permissions',
+        'Require approval and logging for tag, retention and replication changes',
+        'Record read access and exports where the platform supports it',
+        'Restrict deletion of historical records; store audit logs separately',
+        'Serve Level 4 from a replicated historian, never the production database',
+      ] },
     ],
   },
 
@@ -87,6 +109,15 @@ export const LEVEL3_CONTENT = {
       { p: `Alarm priorities, limits, suppression rules and notification routes should be managed through formal change control. Changes should identify the person who requested them, the person who approved them, the time of implementation and the reason for the change.` },
       { p: `Permanent alarm suppression should not be used as a substitute for correcting a process or instrumentation problem. Temporary suppression should have a defined expiration time and should remain visible to operators.` },
       { p: `Analytics models and reporting calculations should also be protected from unauthorized modification. A compromised calculation may produce plausible but incorrect results. Important changes should therefore be version-controlled and tested against known operational data before deployment.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Manage alarm limits, priorities and suppression through formal change control',
+        'Set expiration times on temporary suppression and keep it visible to operators',
+        'Never use permanent suppression instead of fixing the underlying problem',
+        'Version-control analytics models and reporting calculations',
+        'Test calculation changes against known operational data before release',
+      ] },
     ],
   },
 
@@ -107,6 +138,18 @@ export const LEVEL3_CONTENT = {
       { p: `Level 4 applications should exchange data with Level 3 through an industrial demilitarized zone, application proxy, replicated database, message broker or managed file-transfer service. Read-only access should be used whenever the business requirement does not require a response or control action.` },
       { p: `Level 3 should not be used as a transit route. A system should not forward arbitrary traffic between Level 4 and Level 2, and dual-homed servers should be removed where possible. Where an existing application requires connectivity to both sides, strict host-firewall rules, separate service accounts and detailed monitoring should be applied until the architecture can be redesigned.` },
       { p: `The software and updates installed on Level 3 systems are themselves part of the supply chain. The supply-chain controls that apply to Level 4 integration components, including supported-version requirements, vulnerability notification and software bills of materials, also apply to historian, OPC, analytics and security-management software at Level 3.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Enable OPC UA signed and encrypted security modes',
+        'Disable anonymous access unless documented as required and low risk',
+        'Keep certificate trust lists current; reject expired or unknown certificates',
+        'Plan certificate renewal before expiry and protect private keys',
+        'Grant read-only OPC permissions to monitoring-only applications',
+        'Restrict OPC Classic DCOM permissions to named accounts and systems',
+        'Document owner, protocol, direction and data type for every interface',
+        'Remove dual-homed servers or contain them with strict host rules and monitoring',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -130,6 +173,17 @@ export const LEVEL3_CONTENT = {
       { p: `Remote users and vendors should first authenticate to an approved VPN using MFA. They should then connect to a monitored jump host before reaching a specifically authorized Level 3 target. Access should be individually assigned, time-limited and disabled after the maintenance activity.` },
       { p: `Direct internet access to historians, OPC servers, alarm servers and operational databases should not be permitted. Vendor-installed remote-access software should be removed unless it forms part of the approved architecture. Remote sessions should be logged and, for privileged or vendor activity, recorded where possible.` },
       { p: `Emergency access procedures should be defined so that personnel do not create informal bypasses during an outage. Emergency access may use a faster approval process, but it should still require an individual account, MFA and retrospective review.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Check and scan vendor laptops before connection; limit them to required devices',
+        'Block direct USB on servers; route files through a scanned transfer process',
+        'Verify installer hashes or signatures before deployment',
+        'Require VPN with MFA and a monitored jump host for all remote access',
+        'Assign individual, time-limited vendor accounts and disable them after the work',
+        'Remove vendor remote-access software that is outside the approved architecture',
+        'Record privileged and vendor sessions where possible',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -157,6 +211,17 @@ export const LEVEL3_CONTENT = {
 
       { h: 'Capital Investment: Privileged Access Management' },
       { p: `Privileged-access management can protect administrator and vendor accounts. Useful functions include password vaulting, approval workflows, temporary privilege, session recording and automatic credential rotation.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Give every user an individual account; remove shared accounts',
+        'Define least-privilege roles for each job function',
+        'Deny service accounts interactive login and RDP',
+        'Store service passwords in approved credential management, not scripts',
+        'Enforce MFA at the VPN, jump host or gateway for Level 3 access',
+        'Keep the OT directory in its own forest with no trust from the corporate domain',
+        'Use OT-only administrative accounts that never touch corporate systems',
+      ] },
 
       { h: 'Resources' },
       { links: [
@@ -229,6 +294,21 @@ export const LEVEL3_CONTENT = {
       { p: `Endpoint detection and response may be deployed on compatible Level 3 servers after vendor approval and operational testing. Policies should be adapted to the stable nature of industrial applications so that legitimate software is not quarantined automatically during production.` },
       { p: `Capital investment should prioritize removal of direct trust paths and improvement of recoverability. Purchasing additional monitoring tools provides limited value while Level 3 remains flat, shared accounts remain active or backups cannot be restored.` },
 
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Separate Level 3 from Levels 4 and 2 with deny-by-default firewalls',
+        'Segment historians, alarm servers, applications and admin services internally',
+        'Limit outbound connections to documented destinations',
+        'Remove unused services, agents and development tools from servers',
+        'Restrict host firewalls to approved source systems',
+        'Disable RDP, SMB, PowerShell remoting and SSH where not required',
+        'Apply allowlisting and file-integrity monitoring to stable servers',
+        'Use one approved internal time source on all systems',
+        'Deploy passive sensors at the Level 4/3 and 3/2 boundaries',
+        'Deliver critical alerts out-of-band for coverage outside working hours',
+        'Test periodically that alerts still fire and reach the right people',
+      ] },
+
       { h: 'Resources' },
       { links: [
         { label: 'Windows Defender Application Control (WDAC)', url: search('Windows Defender Application Control') },
@@ -263,6 +343,17 @@ export const LEVEL3_CONTENT = {
 
       { h: 'Capital Investment: Redundant Level 3 Services' },
       { p: `Critical historian, alarm and operational services may require redundant servers, storage and network connections. High availability does not replace backups, but it can reduce disruption caused by ordinary hardware failure or the isolation of one compromised server.` },
+
+      { h: 'Hardening Checklist' },
+      { list: [
+        'Patch risk-based, tested, and within approved maintenance windows',
+        'Distribute updates from an internal repository, never directly from the internet',
+        'Create a verified backup and rollback plan before every patch',
+        'Track CISA ICS advisories, vendor PSIRTs and sector ISAC feeds',
+        'Automate scheduled backups of databases, configurations, certificates and media',
+        'Keep one offline or immutable copy under separate backup accounts',
+        'Restore-test backups fully, including operational interfaces, and document the order',
+      ] },
 
       { h: 'Resources' },
       { links: [

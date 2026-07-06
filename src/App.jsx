@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 import Icon from './Icon.jsx';
 import {
@@ -29,6 +29,32 @@ const CONTENT = {
   ...CROSSCUTTING_CONTENT,
 };
 
+// Every { list } block (except those marked plain) is an actionable hardening
+// checklist. Item state is keyed by "<contentId>|<item text>" so it survives
+// list reordering, and persisted in localStorage.
+const CHECKS_STORAGE_KEY = 'ics-hardening-checklist-v1';
+const VALID_CHECK_KEYS = new Set();
+const CHECKLIST_TOTALS = {};
+for (const [id, entry] of Object.entries(CONTENT)) {
+  let n = 0;
+  for (const b of entry.blocks) {
+    if (b.list && !b.plain) {
+      for (const item of b.list) VALID_CHECK_KEYS.add(`${id}|${item}`);
+      n += b.list.length;
+    }
+  }
+  if (n > 0) CHECKLIST_TOTALS[id] = n;
+}
+const TOTAL_CHECK_ITEMS = Object.values(CHECKLIST_TOTALS).reduce((a, b) => a + b, 0);
+
+function loadChecks() {
+  try {
+    return JSON.parse(localStorage.getItem(CHECKS_STORAGE_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
 const ZOOM_MS = 750;
 
 function zoomTransform(rect, pad, maxScale, vAnchor = 0.5) {
@@ -40,13 +66,44 @@ function zoomTransform(rect, pad, maxScale, vAnchor = 0.5) {
   return `translate(${SVG_W / 2}px, ${SVG_H * vAnchor}px) scale(${s}) translate(${-cx}px, ${-cy}px)`;
 }
 
-function ContentBlocks({ blocks }) {
+function Checkbox({ done }) {
+  return (
+    <svg className="checkbox" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+      <rect x="1" y="1" width="14" height="14" rx="3.5"
+        fill={done ? '#0f766e' : '#fff'} stroke={done ? '#0f766e' : '#94a3b8'} strokeWidth="1.4" />
+      {done && (
+        <polyline points="4.2,8.4 7,11.2 11.8,5.4" fill="none" stroke="#fff"
+          strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      )}
+    </svg>
+  );
+}
+
+function ContentBlocks({ blocks, contentId, checks, onToggle }) {
   return (
     <div className="content-blocks">
       {blocks.map((b, i) => {
         if (b.h) return <h3 key={i}>{b.h}</h3>;
         if (b.p) return <p key={i}>{b.p}</p>;
-        if (b.list) return <ul key={i}>{b.list.map((li, j) => <li key={j}>{li}</li>)}</ul>;
+        if (b.list) {
+          if (b.plain) return <ul key={i}>{b.list.map((li, j) => <li key={j}>{li}</li>)}</ul>;
+          return (
+            <ul key={i} className="checklist">
+              {b.list.map((li, j) => {
+                const key = `${contentId}|${li}`;
+                const done = !!checks[key];
+                return (
+                  <li key={j} className={done ? 'done' : ''}>
+                    <button type="button" onClick={() => onToggle(key)} aria-pressed={done}>
+                      <Checkbox done={done} />
+                      <span>{li}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        }
         if (b.code) return <pre key={i} className="mono">{b.code}</pre>;
         if (b.links) return (
           <ul key={i} className="link-list">
@@ -103,7 +160,7 @@ function Conduit({ conduit }) {
   );
 }
 
-function Band({ level, focus, onFocusLevel, onFocusComponent }) {
+function Band({ level, focus, onFocusLevel, onFocusComponent, checkedCounts }) {
   const dimmed = focus && focus.levelId !== level.id;
   const busY = level.y + 82;
   const center = level.h / 2;
@@ -149,6 +206,10 @@ function Band({ level, focus, onFocusLevel, onFocusComponent }) {
       {level.components.map((c) => {
         const isFocused = focus && focus.compId === c.id;
         const compDim = focus && focus.levelId === level.id && focus.compId && !isFocused;
+        const hasContent = !!CONTENT[c.id];
+        const total = CHECKLIST_TOTALS[c.id] || 0;
+        const done = Math.min(checkedCounts[c.id] || 0, total);
+        const complete = hasContent && done >= total;
         return (
           <g
             key={c.id}
@@ -156,6 +217,13 @@ function Band({ level, focus, onFocusLevel, onFocusComponent }) {
             style={{ opacity: compDim ? 0.25 : 1, transition: 'opacity 0.7s ease' }}
             onClick={(e) => { e.stopPropagation(); onFocusComponent(level, c); }}
           >
+            <title>
+              {hasContent
+                ? total > 0
+                  ? `${c.name}: ${done}/${total} hardening items complete`
+                  : c.name
+                : `${c.name}: content pending`}
+            </title>
             <rect className="comp-box" x={c.x} y={c.y} width={c.w} height={c.h} rx="5"
               fill="#ffffff" stroke="#b9c5d3" strokeWidth="1.2" />
             <rect x={c.x} y={c.y} width={c.w} height="4" rx="2" fill={level.accent} opacity="0.85" />
@@ -163,7 +231,13 @@ function Band({ level, focus, onFocusLevel, onFocusComponent }) {
             <text x={c.x + 54} y={c.y + 40} className="comp-name">{c.name}</text>
             <text x={c.x + 54} y={c.y + 58} className="comp-sub">{c.sub}</text>
             <circle cx={c.x + c.w - 14} cy={c.y + 16} r="3"
-              fill={CONTENT[c.id] ? '#16a34a' : '#cbd5e1'} className={CONTENT[c.id] ? 'status-dot' : ''} />
+              fill={!hasContent ? '#cbd5e1' : complete ? '#16a34a' : '#d97706'}
+              className={complete ? 'status-dot' : ''} />
+            {hasContent && total > 0 && !complete && (
+              <text x={c.x + c.w - 22} y={c.y + 19} textAnchor="end" className="comp-progress">
+                {done}/{total}
+              </text>
+            )}
           </g>
         );
       })}
@@ -174,7 +248,42 @@ function Band({ level, focus, onFocusLevel, onFocusComponent }) {
 export default function App() {
   const [focus, setFocus] = useState(null); // { levelId, compId?, title, tag, sub?, rect, accent }
   const [popupOpen, setPopupOpen] = useState(false);
+  const [checks, setChecks] = useState(loadChecks);
   const stageRef = useRef(null);
+
+  const toggleCheck = (key) =>
+    setChecks((prev) => {
+      const next = { ...prev };
+      if (next[key]) delete next[key];
+      else next[key] = true;
+      localStorage.setItem(CHECKS_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+
+  const resetChecks = () => {
+    if (window.confirm('Clear all hardening checklist progress?')) {
+      setChecks({});
+      localStorage.removeItem(CHECKS_STORAGE_KEY);
+    }
+  };
+
+  // Checked-item counts per content node, ignoring keys that no longer match
+  // any current checklist item (e.g. after content edits).
+  const checkedCounts = useMemo(() => {
+    const counts = {};
+    for (const key of Object.keys(checks)) {
+      if (!VALID_CHECK_KEYS.has(key)) continue;
+      const id = key.slice(0, key.indexOf('|'));
+      counts[id] = (counts[id] || 0) + 1;
+    }
+    return counts;
+  }, [checks]);
+
+  const overallDone = useMemo(
+    () => Object.values(checkedCounts).reduce((a, b) => a + b, 0),
+    [checkedCounts],
+  );
+  const overallPct = TOTAL_CHECK_ITEMS ? Math.round((overallDone / TOTAL_CHECK_ITEMS) * 100) : 0;
 
   useEffect(() => {
     if (!focus) { setPopupOpen(false); return; }
@@ -243,12 +352,24 @@ export default function App() {
             <p>Purdue Enterprise Reference Architecture · ISA-95 / IEC 62443</p>
           </div>
         </div>
+        <div className="hardening-progress" title="Checked hardening items across all levels">
+          <span className="hp-label mono">HARDENING PROGRESS</span>
+          <div className="hp-bar">
+            <div className="hp-fill" style={{ width: `${overallPct}%` }} />
+          </div>
+          <span className="hp-count mono">{overallDone}/{TOTAL_CHECK_ITEMS} · {overallPct}%</span>
+          {overallDone > 0 && (
+            <button type="button" className="hp-reset mono" onClick={resetChecks}>RESET</button>
+          )}
+        </div>
       </header>
 
       <div className="legend">
         <span><i className="swatch" style={{ background: '#1e40af' }} />IT traffic</span>
         <span><i className="swatch" style={{ background: '#0f766e' }} />OT telemetry</span>
         <span><i className="swatch" style={{ background: '#475569' }} />Fieldbus / process I-O</span>
+        <span><i className="dot-swatch" style={{ background: '#d97706' }} />Checklist in progress</span>
+        <span><i className="dot-swatch" style={{ background: '#16a34a' }} />Checklist complete</span>
         <button type="button" className="crosscutting-link" onClick={focusCrossCutting}>
           Cross-Cutting Controls (Inventory, Backup &amp; People)
         </button>
@@ -278,6 +399,7 @@ export default function App() {
                 focus={focus}
                 onFocusLevel={focusLevel}
                 onFocusComponent={focusComponent}
+                checkedCounts={checkedCounts}
               />
             ))}
           </g>
@@ -285,14 +407,33 @@ export default function App() {
 
         {focus && popupOpen && (() => {
           const entry = CONTENT[focus.contentId];
+          const total = CHECKLIST_TOTALS[focus.contentId] || 0;
+          const done = Math.min(checkedCounts[focus.contentId] || 0, total);
           return (
             <div className="modal-backdrop" onClick={() => setFocus(null)}>
               <div className={`modal ${entry ? 'modal-wide' : ''}`} onClick={(e) => e.stopPropagation()} style={{ borderTopColor: focus.accent }}>
                 <div className="modal-tag mono" style={{ color: focus.accent }}>{focus.tag}</div>
                 <h2>{focus.title}</h2>
                 {focus.sub && <div className="modal-sub mono">{focus.sub}</div>}
+                {total > 0 && (
+                  <div className="modal-progress">
+                    <div className="mp-bar">
+                      <div className="mp-fill" style={{ width: `${Math.round((done / total) * 100)}%` }} />
+                    </div>
+                    <span className="mono">{done}/{total} HARDENING ITEMS</span>
+                  </div>
+                )}
                 {entry
-                  ? <div className="modal-body-scroll"><ContentBlocks blocks={entry.blocks} /></div>
+                  ? (
+                    <div className="modal-body-scroll">
+                      <ContentBlocks
+                        blocks={entry.blocks}
+                        contentId={focus.contentId}
+                        checks={checks}
+                        onToggle={toggleCheck}
+                      />
+                    </div>
+                  )
                   : <div className="modal-body">Placeholder here</div>}
                 <div className="modal-footer">
                   <span className="mono">ESC or click outside to return</span>
