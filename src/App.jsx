@@ -10,6 +10,10 @@ import {
   BAND_W,
   CONDUIT_X,
   TOP,
+  IDS_X,
+  IDS_W,
+  IDS_PARADIGMS,
+  HYBRID_ROW,
 } from './purdueModel.js';
 import { LEVEL5_CONTENT } from './level5Content.js';
 import { LEVEL4_CONTENT } from './level4Content.js';
@@ -18,6 +22,7 @@ import { LEVEL2_CONTENT } from './level2Content.js';
 import { LEVEL1_CONTENT } from './level1Content.js';
 import { LEVEL0_CONTENT } from './level0Content.js';
 import { CROSSCUTTING_CONTENT } from './crossCuttingContent.js';
+import { IDS_CONTENT } from './idsContent.js';
 
 const CONTENT = {
   ...LEVEL5_CONTENT,
@@ -27,6 +32,7 @@ const CONTENT = {
   ...LEVEL1_CONTENT,
   ...LEVEL0_CONTENT,
   ...CROSSCUTTING_CONTENT,
+  ...IDS_CONTENT,
 };
 
 // Every { list } block (except those marked plain) is an actionable hardening
@@ -256,6 +262,76 @@ function Band({ level, focus, onFocusLevel, onFocusComponent, checkedCounts }) {
   );
 }
 
+function IdsBox({ pdm, x, w, focus, onClick }) {
+  const dim = focus && focus.contentId !== pdm.id;
+  const cx = x + w / 2;
+  const compact = pdm.h < 120;
+  const nameY = pdm.y + (compact ? 30 : 34);
+  const levelsY = pdm.y + (compact ? 46 : 52);
+  const descStart = pdm.y + (compact ? 64 : 76);
+  const lh = compact ? 15 : 17;
+  return (
+    <g className="ids-box" style={{ opacity: dim ? 0.22 : 1, transition: 'opacity 0.7s ease' }} onClick={onClick}>
+      <title>{pdm.title}: click for details</title>
+      <rect className="ids-rect" x={x} y={pdm.y} width={w} height={pdm.h} rx="5"
+        fill={pdm.tint} stroke={pdm.accent} strokeWidth="1.2" />
+      <rect x={x} y={pdm.y} width={w} height="4" rx="2" fill={pdm.accent} opacity="0.85" />
+      <text x={cx} y={nameY} textAnchor="middle" className="ids-name" fill={pdm.accent}>{pdm.name}</text>
+      <text x={cx} y={levelsY} textAnchor="middle" className="ids-levels">{pdm.levels}</text>
+      {pdm.desc.map((line, i) => (
+        <text key={i} x={cx} y={descStart + i * lh} textAnchor="middle" className="ids-desc">{line}</text>
+      ))}
+    </g>
+  );
+}
+
+function IdsPanel({ focus, onFocusParadigm, onFocusOverview }) {
+  const spineX = IDS_X + IDS_W / 2;
+  const lastBand = LEVELS[LEVELS.length - 1];
+  const bandsBottom = lastBand.y + lastBand.h;
+  const dividerX = (BAND_X + BAND_W + IDS_X) / 2;
+  const hybridDim = focus && focus.contentId !== HYBRID_ROW.id;
+  const hybridCy = HYBRID_ROW.y + HYBRID_ROW.h / 2;
+  return (
+    <g>
+      <text x={IDS_X + IDS_W / 2} y={26} textAnchor="middle"
+        className="column-header ids-header" onClick={onFocusOverview}>IDS PARADIGM</text>
+      {/* dashed separator between the Purdue diagram and the panel */}
+      <line x1={dividerX} y1={TOP} x2={dividerX} y2={bandsBottom}
+        stroke="#cbd5e1" strokeWidth="1" strokeDasharray="3 7" />
+      {/* spine linking the paradigms down into the hybrid row */}
+      <line x1={spineX} y1={IDS_PARADIGMS[0].y + IDS_PARADIGMS[0].h} x2={spineX} y2={HYBRID_ROW.y}
+        stroke="#cbd5e1" strokeWidth="1" strokeDasharray="3 7" />
+      {IDS_PARADIGMS.map((pdm) => {
+        const cy = pdm.y + pdm.h / 2;
+        return (
+          <g key={pdm.id}>
+            <line x1={BAND_X + BAND_W + 6} y1={cy} x2={IDS_X - 6} y2={cy}
+              stroke="#94a3b8" strokeWidth="1" strokeDasharray="4 5" />
+            <IdsBox pdm={pdm} x={IDS_X} w={IDS_W} focus={focus} onClick={() => onFocusParadigm(pdm)} />
+          </g>
+        );
+      })}
+      {/* hybrid row: all levels and all paradigms together */}
+      <line x1={BAND_X + BAND_W + 6} y1={hybridCy} x2={IDS_X - 6} y2={hybridCy}
+        stroke="#94a3b8" strokeWidth="1" strokeDasharray="4 5" />
+      <g className="ids-box" style={{ opacity: hybridDim ? 0.22 : 1, transition: 'opacity 0.7s ease' }}
+        onClick={() => onFocusParadigm(HYBRID_ROW)}>
+        <title>All paradigms together form the hybrid architecture</title>
+        <rect className="ids-rect" x={BAND_X} y={HYBRID_ROW.y} width={BAND_W} height={HYBRID_ROW.h} rx="4"
+          fill="#f8fafc" stroke="#c9d2dc" strokeWidth="1" />
+        <rect x={BAND_X} y={HYBRID_ROW.y} width="5" height={HYBRID_ROW.h} fill={HYBRID_ROW.accent} rx="2" />
+        <text x={BAND_X + BAND_W / 2} y={HYBRID_ROW.y + 40} textAnchor="middle"
+          className="ids-name" fill="#0f172a">All Levels</text>
+        <text x={BAND_X + BAND_W / 2} y={HYBRID_ROW.y + 62} textAnchor="middle"
+          className="ids-desc">Layered deployment across OT and IT.</text>
+      </g>
+      <IdsBox pdm={HYBRID_ROW} x={IDS_X} w={IDS_W} focus={focus}
+        onClick={() => onFocusParadigm(HYBRID_ROW)} />
+    </g>
+  );
+}
+
 export default function App() {
   const [focus, setFocus] = useState(null); // { levelId, compId?, title, tag, sub?, rect, accent }
   const [popupOpen, setPopupOpen] = useState(false);
@@ -343,6 +419,30 @@ export default function App() {
       contentId: 'crosscutting',
     });
 
+  const focusParadigm = (p) =>
+    setFocus({
+      levelId: null,
+      compId: p.id,
+      title: p.title,
+      tag: `IDS PARADIGM · ${p.levels}`,
+      rect: p.id === 'ids-hybrid'
+        ? { x: BAND_X, y: p.y, w: IDS_X + IDS_W - BAND_X, h: p.h }
+        : { x: IDS_X, y: p.y, w: IDS_W, h: p.h },
+      accent: p.accent,
+      contentId: p.id,
+    });
+
+  const focusIdsOverview = () =>
+    setFocus({
+      levelId: null,
+      compId: null,
+      title: 'Intrusion Detection in ICS',
+      tag: 'IDS PARADIGMS · ALL LEVELS',
+      rect: { x: IDS_X, y: TOP, w: IDS_W, h: HYBRID_ROW.y + HYBRID_ROW.h - TOP },
+      accent: '#0f172a',
+      contentId: 'ids-overview',
+    });
+
   const worldTransform = focus
     ? zoomTransform(focus.rect, focus.compId ? 34 : 14, focus.compId ? 3.4 : 1.2, focus.compId ? 0.34 : 0.42)
     : 'translate(0px, 0px) scale(1)';
@@ -402,6 +502,7 @@ export default function App() {
           <rect width={SVG_W} height={SVG_H} fill="url(#grid)" />
 
           <g className="world" style={{ transform: worldTransform }}>
+            <text x={BAND_X + 4} y={26} className="column-header">PURDUE LEVEL</text>
             {CONDUITS.map((c) => <Conduit key={c.id} conduit={c} />)}
             {LEVELS.map((level) => (
               <Band
@@ -413,6 +514,11 @@ export default function App() {
                 checkedCounts={checkedCounts}
               />
             ))}
+            <IdsPanel
+              focus={focus}
+              onFocusParadigm={focusParadigm}
+              onFocusOverview={focusIdsOverview}
+            />
           </g>
         </svg>
 

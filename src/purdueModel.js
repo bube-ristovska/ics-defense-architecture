@@ -5,7 +5,7 @@
 // identity/access and integration/API infrastructure that support them.
 // All coordinates are in SVG user units (viewBox space).
 
-export const SVG_W = 1240;
+export const SVG_W = 1545;
 
 export const BAND_X = 40;
 export const BAND_W = 1160;
@@ -178,7 +178,45 @@ export const LEVELS = (() => {
   return out;
 })();
 
-export const SVG_H = LEVELS[LEVELS.length - 1].y + LEVELS[LEVELS.length - 1].h + 40;
+// Right-hand IDS paradigm panel: an informational column aligned with the
+// Purdue level groups each detection paradigm belongs to. All four boxes
+// together form the hybrid architecture, shown as the bottom row.
+export const IDS_X = 1240;
+export const IDS_W = 270;
+const IDS_BOX_H = 150;
+const groupCenter = (i, j) =>
+  LEVELS[i].y + (LEVELS[j].y + LEVELS[j].h - LEVELS[i].y) / 2;
+
+export const IDS_PARADIGMS = [
+  {
+    id: 'ids-signature', name: 'Signature-Based', title: 'Signature-Based Detection',
+    levels: 'LEVELS 4-5', accent: '#1e40af', tint: '#f4f7fd',
+    desc: ['Matches known attack patterns.', 'Low false-positive rate.', 'Best at identifying', 'known variants.'],
+    y: groupCenter(0, 1) - IDS_BOX_H / 2, h: IDS_BOX_H,
+  },
+  {
+    id: 'ids-anomaly', name: 'Anomaly-Based', title: 'Anomaly-Based Detection',
+    levels: 'LEVELS 2-3', accent: '#0f766e', tint: '#f0f9f7',
+    desc: ['Models normal traffic,', 'alerts on deviations.', 'ML/DL at Levels 2-3,', 'statistical at 0-1.'],
+    y: groupCenter(2, 3) - IDS_BOX_H / 2, h: IDS_BOX_H,
+  },
+  {
+    id: 'ids-specification', name: 'Specification-Based', title: 'Specification-Based Detection',
+    levels: 'LEVELS 0-1', accent: '#475569', tint: '#f4f6f9',
+    desc: ['Compares behaviour against', 'formal rules. Catches', 'protocol-valid attacks', '(Industroyer2, PIPEDREAM).'],
+    y: groupCenter(4, 5) - IDS_BOX_H / 2, h: IDS_BOX_H,
+  },
+];
+
+const LAST_BAND_BOTTOM = LEVELS[LEVELS.length - 1].y + LEVELS[LEVELS.length - 1].h;
+export const HYBRID_ROW = {
+  id: 'ids-hybrid', name: 'Hybrid', title: 'Hybrid Detection',
+  levels: 'ALL LEVELS', accent: '#b45309', tint: '#fdf8ef',
+  desc: ['Combines all paradigms.', 'Current state of the art.'],
+  y: LAST_BAND_BOTTOM + 30, h: 92,
+};
+
+export const SVG_H = HYBRID_ROW.y + HYBRID_ROW.h + 36;
 
 // Conduits between adjacent bands; firewalls guard the 5/4, 4/3 and 3/2 boundaries.
 export const CONDUITS = LEVELS.slice(0, -1).map((lvl, i) => {

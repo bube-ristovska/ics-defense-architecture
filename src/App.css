@@ -290,6 +290,53 @@
   opacity: 0.85;
 }
 
+/* ── IDS paradigm panel ──────────────────────────────────── */
+
+.column-header {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  fill: var(--ink-faint);
+}
+
+.ids-header {
+  cursor: pointer;
+}
+
+.ids-header:hover {
+  fill: var(--ink);
+}
+
+.ids-box {
+  cursor: pointer;
+}
+
+.ids-box .ids-rect {
+  transition: stroke-width 0.2s ease, filter 0.2s ease;
+}
+
+.ids-box:hover .ids-rect {
+  stroke-width: 2;
+  filter: drop-shadow(0 3px 6px rgba(15, 23, 42, 0.14));
+}
+
+.ids-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ids-levels {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
+  fill: var(--ink-faint);
+}
+
+.ids-desc {
+  font-size: 11.5px;
+  fill: var(--ink-soft);
+}
+
 /* ── Popup ───────────────────────────────────────────────── */
 
 .modal-backdrop {
