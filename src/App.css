@@ -239,7 +239,12 @@
 }
 
 .comp .comp-box {
-  transition: stroke 0.2s ease, stroke-width 0.2s ease, filter 0.2s ease;
+  transition: stroke 0.2s ease, stroke-width 0.2s ease, filter 0.2s ease, fill 0.4s ease;
+}
+
+.comp .comp-name,
+.comp .comp-sub {
+  transition: fill 0.4s ease;
 }
 
 .comp:hover .comp-box {

@@ -3,7 +3,7 @@
 // shown when the band label is clicked; the rest are per-component deep
 // dives shown when a specific asset box is clicked. Mirrors the structure of
 // level4Content.js and level5Content.js: operational data systems (Historian,
-// Alarm & Analytics, OPC & Integration, Vendor & Remote Access) sit alongside
+// Alarm & Analytics, OPC & Integration, Vendor Access) sit alongside
 // the shared infrastructure tier that supports them (Domain Controller,
 // Monitoring, Backup & Patch).
 //
@@ -33,7 +33,7 @@ export const LEVEL3_CONTENT = {
       { p: `The main Level 3 threat is compromise through a trusted connection. Level 3 systems frequently communicate with Level 4 applications, Level 2 servers, vendor-support platforms and other plant sites. Attackers can use these legitimate relationships to move from a compromised business environment toward the operational network.` },
       { p: `A representative attack path is: compromise of a Level 4 account or application → access to a trusted Level 3 interface → compromise of a historian, operations server or service account → discovery of Level 2 systems → movement through RDP, SMB, OPC, database connections or administrative tools → access to an HMI, SCADA server or engineering workstation.` },
       { p: `This attack path follows the staged movement described by the ICS Cyber Kill Chain. Attackers commonly establish an initial enterprise foothold before collecting credentials, learning the industrial environment and moving toward systems with operational access. The Ukraine power-grid attack demonstrated how access obtained in the enterprise environment could eventually be used to reach systems operated by control-room personnel.` },
-      { p: `See the Historian, Alarm & Analytics, OPC & Integration, Vendor & Remote Access, Domain Controller, Monitoring and Backup & Patch nodes on this level for the specific techniques and controls addressing each part of this chain.` },
+      { p: `See the Historian, Alarm & Analytics, OPC & Integration, Vendor Access, Domain Controller, Monitoring and Backup & Patch nodes on this level for the specific techniques and controls addressing each part of this chain.` },
 
       { h: 'Incident Response and Recovery' },
       { p: `Incident response at Level 3 must be coordinated with operations. Immediately disconnecting a historian, alarm server or interface may affect operator awareness or production reporting. Before containment, the incident team should determine whether the affected system has write access toward Level 2 and whether its removal could disrupt the physical process.` },

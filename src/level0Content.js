@@ -4,8 +4,8 @@
 // specific asset box is clicked. Mirrors the structure of the levels above:
 // primary field-device types (Sensors & Transmitters, Actuators & Drives,
 // Wireless Field Devices, Fieldbus Gateways) sit alongside the shared
-// infrastructure tier that supports them (Physical & Environmental,
-// Calibration & Maintenance, Signal Monitoring, Device Backup & Lifecycle).
+// infrastructure tier that supports them (Physical Security,
+// Field Maintenance, Signal Monitoring, Device Lifecycle).
 //
 // Block shapes: { h } sub-heading, { p } paragraph, { list } bullet list,
 // { links } a labeled list of external resources (real URLs where
@@ -30,7 +30,7 @@ export const LEVEL0_CONTENT = {
       { h: 'Threat Landscape Summary' },
       { p: `The main Level 0 threats are manipulation of sensor values, unauthorized operation of actuators, physical tampering, modification of calibration or configuration, abuse of fieldbus and wireless communication, signal interruption and firmware compromise. The techniques below are mapped to MITRE ATT&CK for ICS, as at the previous levels.` },
       { p: `A representative attack path is: compromise of an engineering or maintenance system → access to a Level 1 controller or field gateway → connection to a smart sensor or actuator → modification of calibration, configuration, limits or commands → incorrect physical behaviour. An attacker with physical access has a shorter path: access to a cabinet or device → connection through a local port or replacement of wiring → manipulation of the signal → physical impact.` },
-      { p: `See the Sensors & Transmitters, Actuators & Drives, Wireless Field Devices, Fieldbus Gateways, Physical & Environmental, Calibration & Maintenance, Signal Monitoring and Device Backup & Lifecycle nodes on this level for the specific techniques and controls addressing each part of this chain.` },
+      { p: `See the Sensors & Transmitters, Actuators & Drives, Wireless Field Devices, Fieldbus Gateways, Physical Security, Field Maintenance, Signal Monitoring and Device Lifecycle nodes on this level for the specific techniques and controls addressing each part of this chain.` },
 
       { h: 'Implementation Priorities' },
       { list: [

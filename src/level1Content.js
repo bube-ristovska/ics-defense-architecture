@@ -4,7 +4,7 @@
 // asset box is clicked. Mirrors the structure of the levels above: primary
 // controller types (PLC/PAC, RTU, IED/Protection Relay, Safety Controller)
 // sit alongside the shared infrastructure tier that supports them
-// (Industrial Protocols, Engineering & Remote Access, Monitoring,
+// (Industrial Protocols, Engineering Access, Monitoring,
 // Firmware & Recovery).
 //
 // Block shapes: { h } sub-heading, { p } paragraph, { list } bullet list,
@@ -33,7 +33,7 @@ export const LEVEL1_CONTENT = {
       { h: 'Threat Landscape Summary' },
       { p: `The main Level 1 threat is unauthorized use of legitimate controller capabilities. Attackers may not need to exploit a software vulnerability if they can reach a programming service, obtain valid engineering credentials or send unauthenticated industrial commands. As at the other levels, the techniques below are mapped to MITRE ATT&CK for ICS.` },
       { p: `A representative attack path is: compromise of a higher-level system → access to a Level 2 engineering workstation or programming service → connection to a Level 1 controller → modification of controller logic, firmware, operating mode or process values → physical process impact.` },
-      { p: `See the PLC / PAC, RTU, IED / Protection Relay, Safety Controller, Industrial Protocols, Engineering & Remote Access, Monitoring and Firmware & Recovery nodes on this level for the specific techniques and controls addressing each part of this chain.` },
+      { p: `See the PLC / PAC, RTU, IED / Protection Relay, Safety Controller, Industrial Protocols, Engineering Access, Monitoring and Firmware & Recovery nodes on this level for the specific techniques and controls addressing each part of this chain.` },
 
       { h: 'Incident Response and Recovery' },
       { p: `Incident response at Level 1 must begin with process safety. When controller compromise is suspected, the response team should determine:` },

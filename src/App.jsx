@@ -57,6 +57,13 @@ function loadChecks() {
 
 const ZOOM_MS = 750;
 
+// SVG text does not wrap; when an estimated width exceeds the space inside
+// the component box, compress the text to fit instead of letting it overflow.
+const fitText = (text, pxPerChar, maxWidth) =>
+  text.length * pxPerChar > maxWidth
+    ? { textLength: maxWidth, lengthAdjust: 'spacingAndGlyphs' }
+    : {};
+
 function zoomTransform(rect, pad, maxScale, vAnchor = 0.5) {
   const w = rect.w + pad * 2;
   const h = rect.h + pad * 2;
@@ -185,7 +192,7 @@ function Band({ level, focus, onFocusLevel, onFocusComponent, checkedCounts }) {
         <text x={BAND_X + 52} y={level.y + center + 13} className="level-num" textAnchor="middle" fill={level.accent}>{level.num}</text>
         <text x={BAND_X + 96} y={level.y + center - 17} className="level-eyebrow">LEVEL {level.num}</text>
         <text x={BAND_X + 96} y={level.y + center + 5} className="level-name">{level.name}</text>
-        <rect x={BAND_X + 96} y={level.y + center + 17} width={level.zone.length * 6.4 + 16} height="19" rx="2.5"
+        <rect x={BAND_X + 96} y={level.y + center + 17} width={level.zone.length * 6.9 + 18} height="19" rx="2.5"
           fill="#fff" stroke={level.accent} strokeWidth="0.8" opacity="0.9" />
         <text x={BAND_X + 104} y={level.y + center + 30} className="zone-chip" fill={level.accent}>{level.zone}</text>
       </g>
@@ -209,11 +216,11 @@ function Band({ level, focus, onFocusLevel, onFocusComponent, checkedCounts }) {
         const hasContent = !!CONTENT[c.id];
         const total = CHECKLIST_TOTALS[c.id] || 0;
         const done = Math.min(checkedCounts[c.id] || 0, total);
-        const complete = hasContent && done >= total;
+        const complete = hasContent && total > 0 && done >= total;
         return (
           <g
             key={c.id}
-            className="comp"
+            className={complete ? 'comp comp-done' : 'comp'}
             style={{ opacity: compDim ? 0.25 : 1, transition: 'opacity 0.7s ease' }}
             onClick={(e) => { e.stopPropagation(); onFocusComponent(level, c); }}
           >
@@ -225,11 +232,15 @@ function Band({ level, focus, onFocusLevel, onFocusComponent, checkedCounts }) {
                 : `${c.name}: content pending`}
             </title>
             <rect className="comp-box" x={c.x} y={c.y} width={c.w} height={c.h} rx="5"
-              fill="#ffffff" stroke="#b9c5d3" strokeWidth="1.2" />
-            <rect x={c.x} y={c.y} width={c.w} height="4" rx="2" fill={level.accent} opacity="0.85" />
-            <Icon type={c.icon} x={c.x + 15} y={c.y + (c.h - 26) / 2 + 2} color={level.accent} />
-            <text x={c.x + 54} y={c.y + 40} className="comp-name">{c.name}</text>
-            <text x={c.x + 54} y={c.y + 58} className="comp-sub">{c.sub}</text>
+              fill={complete ? '#f2f4f7' : '#ffffff'} stroke={complete ? '#ccd4dd' : '#b9c5d3'} strokeWidth="1.2" />
+            <rect x={c.x} y={c.y} width={c.w} height="4" rx="2"
+              fill={complete ? '#9aa7b6' : level.accent} opacity={complete ? 0.6 : 0.85} />
+            <Icon type={c.icon} x={c.x + 15} y={c.y + (c.h - 26) / 2 + 2}
+              color={complete ? '#8b99ab' : level.accent} />
+            <text x={c.x + 54} y={c.y + 40} className="comp-name"
+              style={complete ? { fill: '#8b99ab' } : undefined} {...fitText(c.name, 7.5, 138)}>{c.name}</text>
+            <text x={c.x + 54} y={c.y + 58} className="comp-sub"
+              style={complete ? { fill: '#a9b3c0' } : undefined} {...fitText(c.sub, 6.4, 138)}>{c.sub}</text>
             <circle cx={c.x + c.w - 14} cy={c.y + 16} r="3"
               fill={!hasContent ? '#cbd5e1' : complete ? '#16a34a' : '#d97706'}
               className={complete ? 'status-dot' : ''} />
