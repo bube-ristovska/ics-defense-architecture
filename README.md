@@ -1,39 +1,77 @@
 # ICS Defense Architecture
 
-An interactive Purdue Model hardening guide for Industrial Control Systems, built with React and Vite. The app renders the full Purdue Enterprise Reference Architecture (Levels 5 through 0) as an animated SVG diagram. Every level and component opens into structured, cost-aware hardening guidance aligned with NIST SP 800-82, IEC 62443 and MITRE ATT&CK for ICS.
+An interactive hardening guide for Industrial Control Systems. The app is a visual summary of the master’s thesis **A Defense Architecture for ICS Security**: the Purdue Model (Levels 5 through 0) as a working diagram, with a checklist for every control.
 
-## Features
+Click a level or a component to open cost-aware guidance aligned with NIST SP 800-82, IEC 62443 and MITRE ATT&CK for ICS. Progress is stored in the browser. A local AI advisor can point you at the right section of the guide without sending anything to an external service.
 
-- **Interactive Purdue diagram** — click any level band or component to zoom in and read its hardening guidance; animated data flows, firewalls and Ethernet switch bars mirror a real reference architecture.
-- **Full coverage, Levels 5–0** — corporate IT, business and logistics systems, site operations, supervisory (HMI/SCADA/EWS), controllers (PLC/RTU/SIS) and field devices, plus cross-cutting controls (inventory, backup, people) that span all levels.
-- **Actionable hardening checklists** — every listed hardening measure is a checkable item. Progress persists in the browser (localStorage), each component shows its completion state on the diagram (amber = in progress, green = complete), and an overall progress bar tracks the whole site.
-- **Threat-informed content** — techniques are mapped to MITRE ATT&CK for ICS and grounded in documented incidents (Stuxnet, Ukraine 2015, NotPetya, Colonial Pipeline, TRITON, PIPEDREAM).
-- **Resource links** — each component ends with links to the standards, tools and platforms needed to implement the guidance (NIST publications, CISA advisories, Wazuh, Zeek, Suricata, OPC Foundation, and more).
-- **Local AI advisor** — ask about a level, component or open checklist item. Answers are retrieved from the text already in the app; nothing is sent to an external service. Press `/` or use **AI Advisor** in the legend.
+![Purdue diagram overview](docs/screenshots/overview.png)
 
-## Getting started
+## What the app contains
+
+- **Purdue diagram** — corporate IT through field devices, with firewalls, Ethernet switch bars, and animated flows between levels. The right-hand column maps IDS paradigms (signature, anomaly, specification, hybrid) onto those levels.
+- **Hardening checklists** — every listed measure is checkable. Amber dots mean a node is in progress; green means it is complete. The header tracks site-wide progress.
+- **Threat-informed notes** — techniques are tied to ATT&CK for ICS and to documented incidents (Stuxnet, Ukraine 2015, NotPetya, Colonial Pipeline, TRITON, PIPEDREAM).
+- **AI Advisor** — ask about a level, a control, or which items are still open. Answers come only from the text already in the app.
+
+![HMI hardening checklist](docs/screenshots/hmi-checklist.png)
+
+![Local AI advisor](docs/screenshots/ai-advisor.png)
+
+## How to start it
+
+You need [Node.js](https://nodejs.org/) installed (the LTS version is fine).
+
+Open a terminal in the project folder and run:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Then open http://localhost:5173.
+When Vite is ready it prints a local URL. Open it in the browser:
 
-To create a production build:
+**http://localhost:5173/**
+
+On Windows, from this project’s folder, that looks like:
+
+```bat
+cd C:\Users\risto\Desktop\ics-defense-architecture
+npm install
+npm run dev
+```
+
+Leave the terminal open while you use the app. Stop the server with `Ctrl+C`.
+
+The first `npm install` is only needed once (or after dependencies change). After that, `npm run dev` is enough.
+
+### Production build
 
 ```bash
 npm run build
+npm run preview
 ```
+
+`preview` serves the built files locally so you can check the production bundle.
+
+## Using the app
+
+1. Click a **level label** (for example Supervisory) or a **component** (for example HMI) to open its guidance.
+2. Tick items on the hardening checklist. Progress is saved in this browser (`localStorage`).
+3. Open **Cross-Cutting Controls** for inventory, backup and people measures that apply at every level.
+4. Open **AI Advisor** (or press `/`) to search the guide. Nothing leaves the machine.
+
+`Esc` or a click outside the panel returns to the diagram.
 
 ## Project structure
 
 | File | Purpose |
 |------|---------|
 | `src/purdueModel.js` | Diagram data and geometry: levels, components, layout |
-| `src/level5Content.js` … `src/level0Content.js` | Hardening guidance per Purdue level, keyed by component id |
-| `src/crossCuttingContent.js` | Controls that span all levels (inventory, backup, people) |
-| `src/App.jsx` | Diagram rendering, zoom interaction, checklist state, modal |
-| `src/Icon.jsx` | Line-icon library for diagram components |
+| `src/level5Content.js` … `src/level0Content.js` | Hardening guidance per Purdue level |
+| `src/crossCuttingContent.js` | Controls that span all levels |
+| `src/idsContent.js` | IDS paradigm notes |
+| `src/App.jsx` | Diagram, zoom, checklist state, modal |
+| `src/AiPanel.jsx` | Local advisor UI |
+| `src/aiAdvisor.js` | Retrieval over the in-app text |
 
-To add or edit content, modify the relevant `level*Content.js` file. Content blocks support headings (`h`), paragraphs (`p`), checkable lists (`list`), plain lists (`list` + `plain: true`), code snippets (`code`) and resource links (`links`).
+To add or edit guidance, change the relevant `level*Content.js` file. Content blocks support headings (`h`), paragraphs (`p`), checkable lists (`list`), plain lists (`list` + `plain: true`), code snippets (`code`) and resource links (`links`).
