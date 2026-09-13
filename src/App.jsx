@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 import Icon from './Icon.jsx';
+import AiPanel from './AiPanel.jsx';
 import {
   LEVELS,
   CONDUITS,
@@ -15,43 +16,14 @@ import {
   IDS_PARADIGMS,
   HYBRID_ROW,
 } from './purdueModel.js';
-import { LEVEL5_CONTENT } from './level5Content.js';
-import { LEVEL4_CONTENT } from './level4Content.js';
-import { LEVEL3_CONTENT } from './level3Content.js';
-import { LEVEL2_CONTENT } from './level2Content.js';
-import { LEVEL1_CONTENT } from './level1Content.js';
-import { LEVEL0_CONTENT } from './level0Content.js';
-import { CROSSCUTTING_CONTENT } from './crossCuttingContent.js';
-import { IDS_CONTENT } from './idsContent.js';
+import {
+  CONTENT,
+  CHECKLIST_TOTALS,
+  TOTAL_CHECK_ITEMS,
+  VALID_CHECK_KEYS,
+} from './content.js';
 
-const CONTENT = {
-  ...LEVEL5_CONTENT,
-  ...LEVEL4_CONTENT,
-  ...LEVEL3_CONTENT,
-  ...LEVEL2_CONTENT,
-  ...LEVEL1_CONTENT,
-  ...LEVEL0_CONTENT,
-  ...CROSSCUTTING_CONTENT,
-  ...IDS_CONTENT,
-};
-
-// Every { list } block (except those marked plain) is an actionable hardening
-// checklist. Item state is keyed by "<contentId>|<item text>" so it survives
-// list reordering, and persisted in localStorage.
 const CHECKS_STORAGE_KEY = 'ics-hardening-checklist-v1';
-const VALID_CHECK_KEYS = new Set();
-const CHECKLIST_TOTALS = {};
-for (const [id, entry] of Object.entries(CONTENT)) {
-  let n = 0;
-  for (const b of entry.blocks) {
-    if (b.list && !b.plain) {
-      for (const item of b.list) VALID_CHECK_KEYS.add(`${id}|${item}`);
-      n += b.list.length;
-    }
-  }
-  if (n > 0) CHECKLIST_TOTALS[id] = n;
-}
-const TOTAL_CHECK_ITEMS = Object.values(CHECKLIST_TOTALS).reduce((a, b) => a + b, 0);
 
 function loadChecks() {
   try {
@@ -335,6 +307,7 @@ function IdsPanel({ focus, onFocusParadigm, onFocusOverview }) {
 export default function App() {
   const [focus, setFocus] = useState(null); // { levelId, compId?, title, tag, sub?, rect, accent }
   const [popupOpen, setPopupOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const [checks, setChecks] = useState(loadChecks);
   const stageRef = useRef(null);
 
@@ -380,10 +353,22 @@ export default function App() {
   }, [focus]);
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') setFocus(null); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        if (aiOpen) { setAiOpen(false); return; }
+        setFocus(null);
+        return;
+      }
+      if ((e.key === '/' || (e.key === 'k' && (e.metaKey || e.ctrlKey))) && !e.repeat) {
+        const tag = e.target?.tagName;
+        if (e.key === '/' && (tag === 'INPUT' || tag === 'TEXTAREA')) return;
+        e.preventDefault();
+        setAiOpen(true);
+      }
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [aiOpen]);
 
   const focusLevel = (level) =>
     setFocus({
@@ -443,6 +428,18 @@ export default function App() {
       contentId: 'ids-overview',
     });
 
+  const openContentId = (contentId) => {
+    if (contentId === 'crosscutting') { focusCrossCutting(); setAiOpen(false); return; }
+    if (contentId === 'ids-overview') { focusIdsOverview(); setAiOpen(false); return; }
+    const paradigm = [...IDS_PARADIGMS, HYBRID_ROW].find((p) => p.id === contentId);
+    if (paradigm) { focusParadigm(paradigm); setAiOpen(false); return; }
+    for (const level of LEVELS) {
+      if (level.id === contentId) { focusLevel(level); setAiOpen(false); return; }
+      const c = level.components.find((x) => x.id === contentId);
+      if (c) { focusComponent(level, c); setAiOpen(false); return; }
+    }
+  };
+
   const worldTransform = focus
     ? zoomTransform(focus.rect, focus.compId ? 34 : 14, focus.compId ? 3.4 : 1.2, focus.compId ? 0.34 : 0.42)
     : 'translate(0px, 0px) scale(1)';
@@ -476,15 +473,22 @@ export default function App() {
       </header>
 
       <div className="legend">
-        <span><i className="swatch" style={{ background: '#1e40af' }} />IT traffic</span>
-        <span><i className="swatch" style={{ background: '#0f766e' }} />OT telemetry</span>
-        <span><i className="swatch" style={{ background: '#475569' }} />Fieldbus / process I-O</span>
-        <span><i className="dot-swatch" style={{ background: '#d97706' }} />Checklist in progress</span>
-        <span><i className="dot-swatch" style={{ background: '#16a34a' }} />Checklist complete</span>
-        <button type="button" className="crosscutting-link" onClick={focusCrossCutting}>
-          Cross-Cutting Controls (Inventory, Backup &amp; People)
-        </button>
-        <span className="legend-hint">Click any component or level to inspect</span>
+        <div className="legend-keys">
+          <span><i className="swatch" style={{ background: '#1e40af' }} />IT traffic</span>
+          <span><i className="swatch" style={{ background: '#0f766e' }} />OT telemetry</span>
+          <span><i className="swatch" style={{ background: '#475569' }} />Fieldbus / process I-O</span>
+          <span><i className="dot-swatch" style={{ background: '#d97706' }} />Checklist in progress</span>
+          <span><i className="dot-swatch" style={{ background: '#16a34a' }} />Checklist complete</span>
+        </div>
+        <div className="legend-actions">
+          <button type="button" className="crosscutting-link" onClick={focusCrossCutting}>
+            Cross-Cutting Controls (Inventory, Backup &amp; People)
+          </button>
+          <button type="button" className="ai-open" onClick={() => setAiOpen(true)}>
+            AI Advisor
+          </button>
+          <span className="legend-hint">Click a node to inspect · / to ask</span>
+        </div>
       </div>
 
       <main className="stage" ref={stageRef}>
@@ -529,9 +533,14 @@ export default function App() {
           return (
             <div className="modal-backdrop" onClick={() => setFocus(null)}>
               <div className={`modal ${entry ? 'modal-wide' : ''}`} onClick={(e) => e.stopPropagation()} style={{ borderTopColor: focus.accent }}>
-                <div className="modal-tag mono" style={{ color: focus.accent }}>{focus.tag}</div>
-                <h2>{focus.title}</h2>
-                {focus.sub && <div className="modal-sub mono">{focus.sub}</div>}
+                <div className="modal-head">
+                  <div>
+                    <div className="modal-tag mono" style={{ color: focus.accent }}>{focus.tag}</div>
+                    <h2>{focus.title}</h2>
+                    {focus.sub && <div className="modal-sub mono">{focus.sub}</div>}
+                  </div>
+                  <button type="button" className="icon-close" onClick={() => setFocus(null)} aria-label="Close">×</button>
+                </div>
                 {total > 0 && (
                   <div className="modal-progress">
                     <div className="mp-bar">
@@ -561,6 +570,14 @@ export default function App() {
           );
         })()}
       </main>
+
+      <AiPanel
+        open={aiOpen}
+        onClose={() => setAiOpen(false)}
+        checks={checks}
+        focusId={focus?.contentId || null}
+        onOpenNode={openContentId}
+      />
     </div>
   );
 }

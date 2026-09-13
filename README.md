@@ -9,6 +9,7 @@ An interactive Purdue Model hardening guide for Industrial Control Systems, buil
 - **Actionable hardening checklists** — every listed hardening measure is a checkable item. Progress persists in the browser (localStorage), each component shows its completion state on the diagram (amber = in progress, green = complete), and an overall progress bar tracks the whole site.
 - **Threat-informed content** — techniques are mapped to MITRE ATT&CK for ICS and grounded in documented incidents (Stuxnet, Ukraine 2015, NotPetya, Colonial Pipeline, TRITON, PIPEDREAM).
 - **Resource links** — each component ends with links to the standards, tools and platforms needed to implement the guidance (NIST publications, CISA advisories, Wazuh, Zeek, Suricata, OPC Foundation, and more).
+- **Local AI advisor** — ask about a level, component or open checklist item. Answers are retrieved from the text already in the app; nothing is sent to an external service. Press `/` or use **AI Advisor** in the legend.
 
 ## Getting started
 
